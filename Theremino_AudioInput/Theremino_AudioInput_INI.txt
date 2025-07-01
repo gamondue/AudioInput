@@ -1,0 +1,32 @@
+ Program Params
+===========================================
+Form1_Top=             592
+Form1_Left=            292
+Form1_WindowState=     0
+
+ Input selector
+===========================================
+SelectedAudioIn=       0
+
+ Output slots
+===========================================
+SlotCounter=           -1
+SlotMeter=             1
+SlotSpectrum=          0
+
+ Audio in
+===========================================
+TriggerLevel=          1
+DeadTime=              0
+
+ Bands
+===========================================
+BandsCount=            3
+BandsAGC=              False
+BandsMaxDb=            0
+BandsMinDb=            -60
+BandsMaxFreq=          8000
+BandsMinFreq=          30
+BandsSpeed=            100
+BandsLogX=             True
+BandsLogY=             True
