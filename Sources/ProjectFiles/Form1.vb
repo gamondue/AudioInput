@@ -83,7 +83,7 @@ Public Class Form1
         If s.ToLower.Contains("usb") Then s2 = s2 + " USB"
         Return s2
     End Function
-    Private Sub btn_AudioInputs_ClickButtonArea(ByVal Sender As System.Object, ByVal e As System.EventArgs) Handles btn_AudioInputs.ClickButtonArea
+    Private Sub btn_AudioInputs_ClickButtonArea(ByVal Sender As Object, ByVal e As EventArgs) Handles btn_AudioInputs.ClickButtonArea
         Open_AudioInputs()
     End Sub
 
@@ -103,16 +103,16 @@ Public Class Form1
         vu.Draw(pBox1, m_WaveReader.VuMeterLog, m_WaveReader.TriggerLevel_mV / 1000)
 
         If Slot_Spectrum >= 0 Then
-            SpectrumBands.Update(pbox_SpectrumBars, _
-                                 CSng(txt_BandsMinFreq.NumericValue), _
-                                 CSng(txt_BandsMaxFreq.NumericValue), _
-                                 CSng(txt_BandsMinDb.NumericValue), _
-                                 CSng(txt_BandsMaxDb.NumericValue), _
-                                 chk_BandsLogX.Checked, _
-                                 chk_BandsLogY.Checked, _
-                                 txt_BandsSpeed.NumericValueInteger / 100.0F, _
-                                 FHT.WindowTypes.BlackmanHarris, _
-                                 txt_BandsCount.NumericValueInteger, _
+            SpectrumBands.Update(pbox_SpectrumBars,
+                                 CSng(txt_BandsMinFreq.NumericValue),
+                                 CSng(txt_BandsMaxFreq.NumericValue),
+                                 CSng(txt_BandsMinDb.NumericValue),
+                                 CSng(txt_BandsMaxDb.NumericValue),
+                                 chk_BandsLogX.Checked,
+                                 chk_BandsLogY.Checked,
+                                 txt_BandsSpeed.NumericValueInteger / 100.0F,
+                                 FHT.WindowTypes.BlackmanHarris,
+                                 txt_BandsCount.NumericValueInteger,
                                  chk_BandsAGC.Checked)
             For i As Int32 = 0 To txt_BandsCount.NumericValueInteger - 1
                 Slots.WriteSlot(Slot_Spectrum + i, 1000.0F * SpectrumBands.m_fht.BandsBuffer(i))
@@ -124,19 +124,19 @@ Public Class Form1
     ' ================================================================================================
     '   SAVE INI ON LOST-FOCUS
     ' ================================================================================================
-    Private Sub Properties_LostFocus(ByVal sender As Object, _
-                                     ByVal e As System.EventArgs) Handles txt_SlotCounter.LostFocus, _
-                                                                          txt_SlotMeter.LostFocus, _
-                                                                          txt_SlotSpectrum.LostFocus, _
-                                                                          tk_TriggerLevel.LostFocus, _
-                                                                          txt_BandsCount.LostFocus, _
-                                                                          chk_BandsAGC.LostFocus, _
-                                                                          txt_BandsMaxDb.LostFocus, _
-                                                                          txt_BandsMinDb.LostFocus, _
-                                                                          txt_BandsMaxFreq.LostFocus, _
-                                                                          txt_BandsMinFreq.LostFocus, _
-                                                                          txt_BandsSpeed.LostFocus, _
-                                                                          chk_BandsLogX.LostFocus, _
+    Private Sub Properties_LostFocus(ByVal sender As Object,
+                                     ByVal e As System.EventArgs) Handles txt_SlotCounter.LostFocus,
+                                                                          txt_SlotMeter.LostFocus,
+                                                                          txt_SlotSpectrum.LostFocus,
+                                                                          tk_TriggerLevel.LostFocus,
+                                                                          txt_BandsCount.LostFocus,
+                                                                          chk_BandsAGC.LostFocus,
+                                                                          txt_BandsMaxDb.LostFocus,
+                                                                          txt_BandsMinDb.LostFocus,
+                                                                          txt_BandsMaxFreq.LostFocus,
+                                                                          txt_BandsMinFreq.LostFocus,
+                                                                          txt_BandsSpeed.LostFocus,
+                                                                          chk_BandsLogX.LostFocus,
                                                                           chk_BandsLogY.LostFocus
         Save_INI()
     End Sub
@@ -145,8 +145,8 @@ Public Class Form1
     ' ================================================================================================
     '   SET PROPERTIES
     ' ================================================================================================
-    Private Sub txt_Slots_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txt_SlotCounter.TextChanged, _
-                                                                                                   txt_SlotMeter.TextChanged, _
+    Private Sub txt_Slots_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txt_SlotCounter.TextChanged,
+                                                                                                   txt_SlotMeter.TextChanged,
                                                                                                    txt_SlotSpectrum.TextChanged
         If Not EventsAreEnabled Then Exit Sub
         Set_Props()
@@ -171,11 +171,14 @@ Public Class Form1
         lbl_TrigLevel.Text = m_WaveReader.TriggerLevel_mV.ToString("0 mV")
         lbl_DeadTime.Text = m_WaveReader.DeadTime_uS.ToString("0 uS")
         ' ----------------------------------------------------------------
-        If Slot_Spectrum >= 0 Then
-            Me.Width = 690
-        Else
-            Me.Width = 330
-        End If
+        '''If Slot_Spectrum >= 0 Then
+        '''    Me.Width = 690
+        '''Else
+        '''    Me.Width = 330
+        '''End If
     End Sub
 
+    Private Sub chkEnableServer_CheckedChanged(sender As Object, e As EventArgs) Handles chkEnableServer.CheckedChanged
+        SpectrumBands.ToggleServer(chkEnableServer.Checked)
+    End Sub
 End Class

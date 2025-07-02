@@ -23,6 +23,8 @@ Namespace SpectrumBands
         Private m_Recorder As AudioIn
         Private m_InputBuffer() As Int16
 
+        Private m_netTransfer As Class_NetTransfer
+
         Private m_ddx As Int32
         Private m_ddy As Int32
         Private m_fmin As Single
@@ -38,6 +40,16 @@ Namespace SpectrumBands
 
         Private Sub DataArrived(ByRef data() As Int16)
             m_fifo.AddArray(data)
+
+            ' Invia i dati al server TCP se siamo connessi come client
+            If m_netTransfer IsNot Nothing AndAlso m_netTransfer.IsConnected Then
+                m_netTransfer.SendData(data)
+            End If
+
+            '' Invia i dati a tutti i client connessi se il server è attivo
+            'If m_netTransfer IsNot Nothing AndAlso m_netTransfer.IsServerRunning Then
+            '    m_netTransfer.BroadcastData(data)
+            'End If
         End Sub
 
         Private Function CreateFillBrush(ByVal pbox As PictureBox, _
@@ -56,23 +68,34 @@ Namespace SpectrumBands
             CreateFillBrush.InterpolationColors = myBlend
         End Function
 
-        Friend Sub Initialize(ByVal pbox As PictureBox, ByVal InputDeviceIndex As Int32)
+        Friend Sub Initialize(ByVal pbox As PictureBox, ByVal InputDeviceIndex As Int32,
+                             Optional ByVal tcpServerAddress As String = "localhost",
+                             Optional ByVal tcpServerPort As Integer = 8080)
             CloseAll()
             ReDim m_InputBuffer(m_FourierSamples - 1)
             m_fillBrush = CreateFillBrush(pbox, LinearGradientMode.Vertical)
             m_Recorder = New AudioIn()
-            m_Recorder.InputOn(InputDeviceIndex, _
-                               m_SamplesPerSec, _
-                               m_Channels, _
-                               m_LenBuffers, _
-                               m_NumBuffers, _
+            m_Recorder.InputOn(InputDeviceIndex,
+                               m_SamplesPerSec,
+                               m_Channels,
+                               m_LenBuffers,
+                               m_NumBuffers,
                                New AudioIn.BufferDoneEventHandler(AddressOf DataArrived))
+
+            ' Inizializza la connessione TCP
+            m_netTransfer = New Class_NetTransfer(tcpServerAddress, tcpServerPort)
+            m_netTransfer.Connect()
         End Sub
 
         Friend Sub CloseAll()
             If m_Recorder IsNot Nothing Then
                 m_Recorder.InputOff()
                 m_Recorder = Nothing
+            End If
+
+            If m_netTransfer IsNot Nothing Then
+                m_netTransfer.Disconnect()
+                m_netTransfer = Nothing
             End If
         End Sub
 
@@ -142,5 +165,22 @@ Namespace SpectrumBands
             pbox.Invalidate()
         End Sub
 
+        Friend Sub ToggleServer(isServerEnabled As Boolean, Optional serverPort As Integer = 8080)
+            If isServerEnabled Then
+                ' Avvia il server se non è già in esecuzione
+                If m_netTransfer Is Nothing Then
+                    m_netTransfer = New Class_NetTransfer()
+                End If
+
+                If Not m_netTransfer.IsServerRunning Then
+                    m_netTransfer.StartServer(serverPort)
+                End If
+            Else
+                ' Ferma il server se è in esecuzione
+                If m_netTransfer IsNot Nothing AndAlso m_netTransfer.IsServerRunning Then
+                    m_netTransfer.StopServer()
+                End If
+            End If
+        End Sub
     End Module
 End Namespace
