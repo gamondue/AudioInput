@@ -182,5 +182,55 @@ Namespace SpectrumBands
                 End If
             End If
         End Sub
+
+#Region "Time sync Methods"
+        ' Variabile per tenere traccia degli handler di eventi
+        Private m_syncHandlerAttached As Boolean = False
+
+        ' Richiedi sincronizzazione NTP
+        Friend Function RequestNTPSync() As Boolean
+            If m_netTransfer Is Nothing OrElse Not m_netTransfer.IsConnected Then
+                Return False
+            End If
+
+            ' Aggiunge handler per l'evento di completamento, se non già fatto
+            If Not m_syncHandlerAttached Then
+                AddHandler m_netTransfer.SyncCompleted, AddressOf OnSyncCompleted
+                m_syncHandlerAttached = True
+            End If
+
+            ' Invia richiesta di sincronizzazione
+            m_netTransfer.RequestTimeSync()
+            Return True
+        End Function
+
+        ' Callback quando la sincronizzazione è completata
+        Private Sub OnSyncCompleted(offsetMs As Long, roundTripMs As Long)
+            ' Qui puoi aggiungere codice per notificare l'UI del completamento
+            ' Ad esempio, aggiornare una label con le informazioni di sincronizzazione
+            ' O chiamare un delegato/evento per notificare il form
+
+            ' Esempio: potremmo esporre un evento pubblico
+            RaiseSyncCompletedEvent(offsetMs, roundTripMs)
+        End Sub
+
+        ' Delegato e evento per notificare il form della sincronizzazione completata
+        Public Delegate Sub SyncCompletedEventHandler(offsetMs As Long, roundTripMs As Long)
+        Public Event SyncCompleted As SyncCompletedEventHandler
+
+        ' Metodo per sollevare l'evento
+        Private Sub RaiseSyncCompletedEvent(offsetMs As Long, roundTripMs As Long)
+            RaiseEvent SyncCompleted(offsetMs, roundTripMs)
+        End Sub
+
+        ' Ottieni il tempo sincronizzato
+        Friend Function GetSynchronizedTime() As DateTime
+            If m_netTransfer IsNot Nothing Then
+                Return m_netTransfer.GetSynchronizedTime()
+            Else
+                Return DateTime.UtcNow
+            End If
+        End Function
+#End Region
     End Module
 End Namespace

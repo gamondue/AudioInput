@@ -22,6 +22,9 @@ Public Class Form1
         GroupBox3.Focus()
         Refresh()
         Opacity = 1
+
+        ' Registra l'handler per l'evento di sincronizzazione completata
+        AddHandler SpectrumBands.SyncCompleted, AddressOf OnSyncCompleted
     End Sub
 
     Private Sub Form_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles Me.FormClosing
@@ -84,7 +87,7 @@ Public Class Form1
         Return s2
     End Function
     Private Sub btn_AudioInputs_ClickButtonArea(ByVal Sender As Object, ByVal e As EventArgs) Handles btn_AudioInputs.ClickButtonArea
-        Open_AudioInputs()
+        Open_AudioInputs
     End Sub
 
 
@@ -180,5 +183,39 @@ Public Class Form1
 
     Private Sub chkEnableServer_CheckedChanged(sender As Object, e As EventArgs) Handles chkEnableServer.CheckedChanged
         SpectrumBands.ToggleServer(chkEnableServer.Checked)
+    End Sub
+
+    Private Sub btnSyncNTP_ClickButtonArea(Sender As Object, e As EventArgs) Handles btnSyncNTP.ClickButtonArea
+        ' Controlla se il client è connesso
+        If SpectrumBands.RequestNTPSync() Then
+            btnSyncNTP.Enabled = False
+            lblSyncStatus.Text = "Sincronizzazione in corso..."
+
+            ' Riabilita il pulsante dopo 5 secondi
+            Dim timer As New Timer With {.Interval = 5000}
+            AddHandler timer.Tick, Sub(s, args)
+                                       btnSyncNTP.Enabled = True
+                                       timer.Stop()
+                                       timer.Dispose()
+                                   End Sub
+            timer.Start()
+        Else
+            lblSyncStatus.Text = "Impossibile sincronizzare: client non connesso"
+        End If
+    End Sub
+
+    ' Gestore per l'evento di completamento
+    Private Sub OnSyncCompleted(offsetMs As Long, roundTripMs As Long)
+        ' Questo viene chiamato quando la sincronizzazione è completata
+        ' Utilizza Invoke se necessario per aggiornare l'UI da un thread diverso
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() UpdateSyncUI(offsetMs, roundTripMs))
+        Else
+            UpdateSyncUI(offsetMs, roundTripMs)
+        End If
+    End Sub
+
+    Private Sub UpdateSyncUI(offsetMs As Long, roundTripMs As Long)
+        lblSyncStatus.Text = $"Sincronizzazione completata. Offset: {offsetMs} ms, RTT: {roundTripMs} ms"
     End Sub
 End Class

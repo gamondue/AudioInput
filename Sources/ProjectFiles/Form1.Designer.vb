@@ -40,6 +40,10 @@ Partial Class Form1
         Dim CBlendItems7 As cBlendItems = New cBlendItems()
         Dim CBlendItems8 As cBlendItems = New cBlendItems()
         Dim DesignerRectTracker8 As DesignerRectTracker = New DesignerRectTracker()
+        Dim DesignerRectTracker9 As DesignerRectTracker = New DesignerRectTracker()
+        Dim CBlendItems9 As cBlendItems = New cBlendItems()
+        Dim CBlendItems10 As cBlendItems = New cBlendItems()
+        Dim DesignerRectTracker10 As DesignerRectTracker = New DesignerRectTracker()
         Timer1 = New Timer(components)
         tk_TriggerLevel = New TrackBar()
         Label1 = New Label()
@@ -58,6 +62,7 @@ Partial Class Form1
         GroupBox3 = New GroupBox()
         pBox1 = New PictureBox()
         GroupBox_Bands = New GroupBox()
+        btnSyncNTP = New MyButton()
         chkEnableServer = New CheckBox()
         chk_BandsAGC = New MyButton()
         chk_BandsLogY = New MyButton()
@@ -78,6 +83,7 @@ Partial Class Form1
         btn_AudioInputs = New MyButton()
         cmb_AudioInDevices = New MyComboBox()
         GroupBox4 = New GroupBox()
+        lblSyncStatus = New Label()
         CType(tk_TriggerLevel, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox2.SuspendLayout()
         CType(tk_DeadTime, ComponentModel.ISupportInitialize).BeginInit()
@@ -348,6 +354,8 @@ Partial Class Form1
         ' 
         GroupBox_Bands.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right
         GroupBox_Bands.BackColor = Color.LightGoldenrodYellow
+        GroupBox_Bands.Controls.Add(lblSyncStatus)
+        GroupBox_Bands.Controls.Add(btnSyncNTP)
         GroupBox_Bands.Controls.Add(chkEnableServer)
         GroupBox_Bands.Controls.Add(chk_BandsAGC)
         GroupBox_Bands.Controls.Add(chk_BandsLogY)
@@ -377,6 +385,59 @@ Partial Class Form1
         GroupBox_Bands.TabStop = False
         GroupBox_Bands.Text = "FHT Spectrum bands"
         ' 
+        ' btnSyncNTP
+        ' 
+        btnSyncNTP.BackColor = Color.WhiteSmoke
+        btnSyncNTP.BorderColor = Color.DarkGray
+        DesignerRectTracker1.IsActive = False
+        DesignerRectTracker1.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker1.TrackerRectangle"), RectangleF)
+        btnSyncNTP.CenterPtTracker = DesignerRectTracker1
+        CBlendItems1.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
+        CBlendItems1.iPoint = New Single() {0F, 0.8683274F, 1F}
+        btnSyncNTP.ColorFillBlend = CBlendItems1
+        CBlendItems2.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
+        CBlendItems2.iPoint = New Single() {0F, 0.2491103F, 1F}
+        btnSyncNTP.ColorFillBlendChecked = CBlendItems2
+        btnSyncNTP.ColorFillSolid = SystemColors.Control
+        btnSyncNTP.ColorFillSolidChecked = SystemColors.Control
+        btnSyncNTP.Corners.All = 6S
+        btnSyncNTP.Corners.LowerLeft = 6S
+        btnSyncNTP.Corners.LowerRight = 6S
+        btnSyncNTP.Corners.UpperLeft = 6S
+        btnSyncNTP.Corners.UpperRight = 6S
+        btnSyncNTP.DimFactorOver = 30
+        btnSyncNTP.FillType = MyButton.eFillType.LinearVertical
+        btnSyncNTP.FillTypeChecked = MyButton.eFillType.LinearVertical
+        btnSyncNTP.FocalPoints.CenterPtX = 1F
+        btnSyncNTP.FocalPoints.CenterPtY = 1F
+        btnSyncNTP.FocalPoints.FocusPtX = 0F
+        btnSyncNTP.FocalPoints.FocusPtY = 0F
+        btnSyncNTP.FocalPointsChecked.CenterPtX = 0F
+        btnSyncNTP.FocalPointsChecked.CenterPtY = 0F
+        btnSyncNTP.FocalPointsChecked.FocusPtX = 0F
+        btnSyncNTP.FocalPointsChecked.FocusPtY = 0F
+        DesignerRectTracker2.IsActive = False
+        DesignerRectTracker2.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker2.TrackerRectangle"), RectangleF)
+        btnSyncNTP.FocusPtTracker = DesignerRectTracker2
+        btnSyncNTP.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        btnSyncNTP.Image = Nothing
+        btnSyncNTP.ImageAlign = ContentAlignment.MiddleCenter
+        btnSyncNTP.ImageIndex = 0
+        btnSyncNTP.ImageSize = New Size(16, 16)
+        btnSyncNTP.Location = New Point(304, 65)
+        btnSyncNTP.Margin = New Padding(4, 3, 4, 3)
+        btnSyncNTP.Name = "btnSyncNTP"
+        btnSyncNTP.Shape = MyButton.eShape.Rectangle
+        btnSyncNTP.SideImage = Nothing
+        btnSyncNTP.SideImageAlign = ContentAlignment.MiddleCenter
+        btnSyncNTP.SideImageSize = New Size(32, 32)
+        btnSyncNTP.Size = New Size(73, 21)
+        btnSyncNTP.TabIndex = 236
+        btnSyncNTP.Text = "Sync PCs"
+        btnSyncNTP.TextImageRelation = TextImageRelation.ImageAboveText
+        btnSyncNTP.TextMargin = New Padding(0)
+        btnSyncNTP.TextShadow = Color.Transparent
+        ' 
         ' chkEnableServer
         ' 
         chkEnableServer.AutoSize = True
@@ -390,17 +451,17 @@ Partial Class Form1
         ' chk_BandsAGC
         ' 
         chk_BandsAGC.BorderColor = Color.DarkGray
-        DesignerRectTracker1.IsActive = False
-        DesignerRectTracker1.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker1.TrackerRectangle"), RectangleF)
-        chk_BandsAGC.CenterPtTracker = DesignerRectTracker1
+        DesignerRectTracker3.IsActive = False
+        DesignerRectTracker3.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker3.TrackerRectangle"), RectangleF)
+        chk_BandsAGC.CenterPtTracker = DesignerRectTracker3
         chk_BandsAGC.CheckButton = True
         chk_BandsAGC.Checked = True
-        CBlendItems1.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
-        CBlendItems1.iPoint = New Single() {0F, 0.8683274F, 1F}
-        chk_BandsAGC.ColorFillBlend = CBlendItems1
-        CBlendItems2.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
-        CBlendItems2.iPoint = New Single() {0F, 0.2491103F, 1F}
-        chk_BandsAGC.ColorFillBlendChecked = CBlendItems2
+        CBlendItems3.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
+        CBlendItems3.iPoint = New Single() {0F, 0.8683274F, 1F}
+        chk_BandsAGC.ColorFillBlend = CBlendItems3
+        CBlendItems4.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
+        CBlendItems4.iPoint = New Single() {0F, 0.2491103F, 1F}
+        chk_BandsAGC.ColorFillBlendChecked = CBlendItems4
         chk_BandsAGC.ColorFillSolid = SystemColors.Control
         chk_BandsAGC.ColorFillSolidChecked = SystemColors.Control
         chk_BandsAGC.Corners.All = 6S
@@ -419,9 +480,9 @@ Partial Class Form1
         chk_BandsAGC.FocalPointsChecked.CenterPtY = 0F
         chk_BandsAGC.FocalPointsChecked.FocusPtX = 0F
         chk_BandsAGC.FocalPointsChecked.FocusPtY = 0F
-        DesignerRectTracker2.IsActive = False
-        DesignerRectTracker2.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker2.TrackerRectangle"), RectangleF)
-        chk_BandsAGC.FocusPtTracker = DesignerRectTracker2
+        DesignerRectTracker4.IsActive = False
+        DesignerRectTracker4.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker4.TrackerRectangle"), RectangleF)
+        chk_BandsAGC.FocusPtTracker = DesignerRectTracker4
         chk_BandsAGC.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         chk_BandsAGC.Image = Nothing
         chk_BandsAGC.ImageAlign = ContentAlignment.MiddleCenter
@@ -444,16 +505,16 @@ Partial Class Form1
         ' chk_BandsLogY
         ' 
         chk_BandsLogY.BorderColor = Color.DarkGray
-        DesignerRectTracker3.IsActive = False
-        DesignerRectTracker3.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker3.TrackerRectangle"), RectangleF)
-        chk_BandsLogY.CenterPtTracker = DesignerRectTracker3
+        DesignerRectTracker5.IsActive = False
+        DesignerRectTracker5.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker5.TrackerRectangle"), RectangleF)
+        chk_BandsLogY.CenterPtTracker = DesignerRectTracker5
         chk_BandsLogY.CheckButton = True
-        CBlendItems3.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
-        CBlendItems3.iPoint = New Single() {0F, 0.8683274F, 1F}
-        chk_BandsLogY.ColorFillBlend = CBlendItems3
-        CBlendItems4.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
-        CBlendItems4.iPoint = New Single() {0F, 0.2491103F, 1F}
-        chk_BandsLogY.ColorFillBlendChecked = CBlendItems4
+        CBlendItems5.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
+        CBlendItems5.iPoint = New Single() {0F, 0.8683274F, 1F}
+        chk_BandsLogY.ColorFillBlend = CBlendItems5
+        CBlendItems6.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
+        CBlendItems6.iPoint = New Single() {0F, 0.2491103F, 1F}
+        chk_BandsLogY.ColorFillBlendChecked = CBlendItems6
         chk_BandsLogY.ColorFillSolid = SystemColors.Control
         chk_BandsLogY.ColorFillSolidChecked = SystemColors.Control
         chk_BandsLogY.Corners.All = 6S
@@ -472,9 +533,9 @@ Partial Class Form1
         chk_BandsLogY.FocalPointsChecked.CenterPtY = 0F
         chk_BandsLogY.FocalPointsChecked.FocusPtX = 0F
         chk_BandsLogY.FocalPointsChecked.FocusPtY = 0F
-        DesignerRectTracker4.IsActive = True
-        DesignerRectTracker4.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker4.TrackerRectangle"), RectangleF)
-        chk_BandsLogY.FocusPtTracker = DesignerRectTracker4
+        DesignerRectTracker6.IsActive = True
+        DesignerRectTracker6.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker6.TrackerRectangle"), RectangleF)
+        chk_BandsLogY.FocusPtTracker = DesignerRectTracker6
         chk_BandsLogY.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         chk_BandsLogY.Image = Nothing
         chk_BandsLogY.ImageAlign = ContentAlignment.MiddleCenter
@@ -497,17 +558,17 @@ Partial Class Form1
         ' chk_BandsLogX
         ' 
         chk_BandsLogX.BorderColor = Color.DarkGray
-        DesignerRectTracker5.IsActive = False
-        DesignerRectTracker5.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker5.TrackerRectangle"), RectangleF)
-        chk_BandsLogX.CenterPtTracker = DesignerRectTracker5
+        DesignerRectTracker7.IsActive = False
+        DesignerRectTracker7.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker7.TrackerRectangle"), RectangleF)
+        chk_BandsLogX.CenterPtTracker = DesignerRectTracker7
         chk_BandsLogX.CheckButton = True
         chk_BandsLogX.Checked = True
-        CBlendItems5.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
-        CBlendItems5.iPoint = New Single() {0F, 0.8683274F, 1F}
-        chk_BandsLogX.ColorFillBlend = CBlendItems5
-        CBlendItems6.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
-        CBlendItems6.iPoint = New Single() {0F, 0.2491103F, 1F}
-        chk_BandsLogX.ColorFillBlendChecked = CBlendItems6
+        CBlendItems7.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
+        CBlendItems7.iPoint = New Single() {0F, 0.8683274F, 1F}
+        chk_BandsLogX.ColorFillBlend = CBlendItems7
+        CBlendItems8.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
+        CBlendItems8.iPoint = New Single() {0F, 0.2491103F, 1F}
+        chk_BandsLogX.ColorFillBlendChecked = CBlendItems8
         chk_BandsLogX.ColorFillSolid = SystemColors.Control
         chk_BandsLogX.ColorFillSolidChecked = SystemColors.Control
         chk_BandsLogX.Corners.All = 6S
@@ -526,9 +587,9 @@ Partial Class Form1
         chk_BandsLogX.FocalPointsChecked.CenterPtY = 0F
         chk_BandsLogX.FocalPointsChecked.FocusPtX = 0F
         chk_BandsLogX.FocalPointsChecked.FocusPtY = 0F
-        DesignerRectTracker6.IsActive = False
-        DesignerRectTracker6.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker6.TrackerRectangle"), RectangleF)
-        chk_BandsLogX.FocusPtTracker = DesignerRectTracker6
+        DesignerRectTracker8.IsActive = False
+        DesignerRectTracker8.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker8.TrackerRectangle"), RectangleF)
+        chk_BandsLogX.FocusPtTracker = DesignerRectTracker8
         chk_BandsLogX.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         chk_BandsLogX.Image = Nothing
         chk_BandsLogX.ImageAlign = ContentAlignment.MiddleCenter
@@ -791,15 +852,15 @@ Partial Class Form1
         ' 
         btn_AudioInputs.BackColor = Color.WhiteSmoke
         btn_AudioInputs.BorderColor = Color.DarkGray
-        DesignerRectTracker7.IsActive = False
-        DesignerRectTracker7.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker7.TrackerRectangle"), RectangleF)
-        btn_AudioInputs.CenterPtTracker = DesignerRectTracker7
-        CBlendItems7.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
-        CBlendItems7.iPoint = New Single() {0F, 0.8683274F, 1F}
-        btn_AudioInputs.ColorFillBlend = CBlendItems7
-        CBlendItems8.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
-        CBlendItems8.iPoint = New Single() {0F, 0.2491103F, 1F}
-        btn_AudioInputs.ColorFillBlendChecked = CBlendItems8
+        DesignerRectTracker9.IsActive = False
+        DesignerRectTracker9.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker9.TrackerRectangle"), RectangleF)
+        btn_AudioInputs.CenterPtTracker = DesignerRectTracker9
+        CBlendItems9.iColor = New Color() {Color.FromArgb(CByte(255), CByte(255), CByte(192)), Color.FromArgb(CByte(220), CByte(220), CByte(192)), Color.FromArgb(CByte(150), CByte(140), CByte(140))}
+        CBlendItems9.iPoint = New Single() {0F, 0.8683274F, 1F}
+        btn_AudioInputs.ColorFillBlend = CBlendItems9
+        CBlendItems10.iColor = New Color() {Color.FromArgb(CByte(255), CByte(170), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0)), Color.FromArgb(CByte(255), CByte(255), CByte(0))}
+        CBlendItems10.iPoint = New Single() {0F, 0.2491103F, 1F}
+        btn_AudioInputs.ColorFillBlendChecked = CBlendItems10
         btn_AudioInputs.ColorFillSolid = SystemColors.Control
         btn_AudioInputs.ColorFillSolidChecked = SystemColors.Control
         btn_AudioInputs.Corners.All = 6S
@@ -818,9 +879,9 @@ Partial Class Form1
         btn_AudioInputs.FocalPointsChecked.CenterPtY = 0F
         btn_AudioInputs.FocalPointsChecked.FocusPtX = 0F
         btn_AudioInputs.FocalPointsChecked.FocusPtY = 0F
-        DesignerRectTracker8.IsActive = False
-        DesignerRectTracker8.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker8.TrackerRectangle"), RectangleF)
-        btn_AudioInputs.FocusPtTracker = DesignerRectTracker8
+        DesignerRectTracker10.IsActive = False
+        DesignerRectTracker10.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker10.TrackerRectangle"), RectangleF)
+        btn_AudioInputs.FocusPtTracker = DesignerRectTracker10
         btn_AudioInputs.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         btn_AudioInputs.Image = Nothing
         btn_AudioInputs.ImageAlign = ContentAlignment.MiddleCenter
@@ -887,6 +948,15 @@ Partial Class Form1
         GroupBox4.TabIndex = 235
         GroupBox4.TabStop = False
         GroupBox4.Text = "Input"
+        ' 
+        ' lblSyncStatus
+        ' 
+        lblSyncStatus.AutoSize = True
+        lblSyncStatus.Location = New Point(306, 103)
+        lblSyncStatus.Name = "lblSyncStatus"
+        lblSyncStatus.Size = New Size(71, 13)
+        lblSyncStatus.TabIndex = 237
+        lblSyncStatus.Text = "lblSyncStatus"
         ' 
         ' Form1
         ' 
@@ -959,4 +1029,6 @@ Partial Class Form1
     Friend WithEvents cmb_AudioInDevices As MyComboBox
     Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
     Friend WithEvents chkEnableServer As CheckBox
+    Friend WithEvents btnSyncNTP As MyButton
+    Friend WithEvents lblSyncStatus As Label
 End Class
