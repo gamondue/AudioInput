@@ -3,7 +3,7 @@ Imports System.Net.Sockets
 Imports System.Threading
 
 Namespace SpectrumBands
-    Public Class Class_NetTransfer
+    Public Class Class_NetTransferTCP
 
         ' Proprietà e variabili per la modalità client
         Private m_tcpClient As TcpClient

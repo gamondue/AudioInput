@@ -25,6 +25,12 @@ Public Class Form1
 
         ' Registra l'handler per l'evento di sincronizzazione completata
         AddHandler SpectrumBands.SyncCompleted, AddressOf OnSyncCompleted
+
+        ' eventi UDP
+        AddHandler SpectrumBands.SyncCompleted, AddressOf OnSyncCompleted
+        AddHandler SpectrumBands.UdpClientConnected, AddressOf OnUdpClientConnected
+        AddHandler SpectrumBands.UdpClientDisconnected, AddressOf OnUdpClientDisconnected
+        AddHandler SpectrumBands.UdpServerStatusChanged, AddressOf OnUdpServerStatusChanged
     End Sub
 
     Private Sub Form_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles Me.FormClosing
@@ -51,14 +57,14 @@ Public Class Form1
     '  SELECT AUDIO INPUT 
     ' ===================================================================================================
     Friend SelectedAudioIn As Int32 = 0
-    Private Sub cmb_AudioInDevices_DropDown(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmb_AudioInDevices.DropDown
+    Private Sub cmb_AudioInDevices_DropDown(ByVal sender As Object, ByVal e As EventArgs)
         cmb_AudioInDevices.ItemHeight = 16
         FillAudioDevicesCombo()
     End Sub
-    Private Sub cmb_AudioInDevices_DropDownClosed(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmb_AudioInDevices.DropDownClosed
+    Private Sub cmb_AudioInDevices_DropDownClosed(ByVal sender As Object, ByVal e As EventArgs)
         cmb_AudioInDevices.ItemHeight = 11
     End Sub
-    Private Sub cmb_AudioInDevices_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles cmb_AudioInDevices.SelectedIndexChanged
+    Private Sub cmb_AudioInDevices_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs)
         If Not EventsAreEnabled Then Exit Sub
         SelectedAudioIn = cmb_AudioInDevices.SelectedIndex
         m_WaveReader.RecordStart(SelectedAudioIn)
@@ -86,8 +92,8 @@ Public Class Form1
         If s.ToLower.Contains("usb") Then s2 = s2 + " USB"
         Return s2
     End Function
-    Private Sub btn_AudioInputs_ClickButtonArea(ByVal Sender As Object, ByVal e As EventArgs) Handles btn_AudioInputs.ClickButtonArea
-        Open_AudioInputs
+    Private Sub btn_AudioInputs_ClickButtonArea(ByVal Sender As Object, ByVal e As EventArgs)
+        Open_AudioInputs()
     End Sub
 
 
@@ -128,19 +134,7 @@ Public Class Form1
     '   SAVE INI ON LOST-FOCUS
     ' ================================================================================================
     Private Sub Properties_LostFocus(ByVal sender As Object,
-                                     ByVal e As System.EventArgs) Handles txt_SlotCounter.LostFocus,
-                                                                          txt_SlotMeter.LostFocus,
-                                                                          txt_SlotSpectrum.LostFocus,
-                                                                          tk_TriggerLevel.LostFocus,
-                                                                          txt_BandsCount.LostFocus,
-                                                                          chk_BandsAGC.LostFocus,
-                                                                          txt_BandsMaxDb.LostFocus,
-                                                                          txt_BandsMinDb.LostFocus,
-                                                                          txt_BandsMaxFreq.LostFocus,
-                                                                          txt_BandsMinFreq.LostFocus,
-                                                                          txt_BandsSpeed.LostFocus,
-                                                                          chk_BandsLogX.LostFocus,
-                                                                          chk_BandsLogY.LostFocus
+                                     ByVal e As EventArgs) Handles tk_TriggerLevel.LostFocus
         Save_INI()
     End Sub
 
@@ -148,9 +142,7 @@ Public Class Form1
     ' ================================================================================================
     '   SET PROPERTIES
     ' ================================================================================================
-    Private Sub txt_Slots_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles txt_SlotCounter.TextChanged,
-                                                                                                   txt_SlotMeter.TextChanged,
-                                                                                                   txt_SlotSpectrum.TextChanged
+    Private Sub txt_Slots_TextChanged(ByVal sender As Object, ByVal e As EventArgs)
         If Not EventsAreEnabled Then Exit Sub
         Set_Props()
     End Sub
@@ -185,9 +177,9 @@ Public Class Form1
         SpectrumBands.ToggleServer(chkEnableServer.Checked)
     End Sub
 
-    Private Sub btnSyncNTP_ClickButtonArea(Sender As Object, e As EventArgs) Handles btnSyncNTP.ClickButtonArea
+    Private Sub btnSyncNTP_ClickButtonArea(Sender As Object, e As EventArgs)
         ' Controlla se il client è connesso
-        If SpectrumBands.RequestNTPSync() Then
+        If SpectrumBands.RequestNTPSync Then
             btnSyncNTP.Enabled = False
             lblSyncStatus.Text = "Sincronizzazione in corso..."
 
@@ -214,8 +206,82 @@ Public Class Form1
             UpdateSyncUI(offsetMs, roundTripMs)
         End If
     End Sub
+    Private Sub OnUdpClientConnected(clientId As String, endPointInfo As String)
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() lstClients.Items.Add($"{clientId} ({endPointInfo})"))
+        Else
+            lstClients.Items.Add($"{clientId} ({endPointInfo})")
+        End If
+    End Sub
 
+    Private Sub OnUdpServerStatusChanged(isRunning As Boolean)
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() UpdateServerStatusUI(isRunning))
+        Else
+            UpdateServerStatusUI(isRunning)
+        End If
+    End Sub
+    Private Sub OnUdpClientDisconnected(clientId As String)
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() RemoveClientFromList(clientId))
+        Else
+            RemoveClientFromList(clientId)
+        End If
+    End Sub
+
+    Private Sub RemoveClientFromList(clientId As String)
+        For i As Integer = lstClients.Items.Count - 1 To 0 Step -1
+            If lstClients.Items(i).ToString().StartsWith(clientId) Then
+                lstClients.Items.RemoveAt(i)
+                Exit For
+            End If
+        Next
+    End Sub
+
+    Private Sub UpdateServerStatusUI(isRunning As Boolean)
+        If isRunning Then
+            lblServerStatus.Text = "Server UDP in ascolto"
+            btnToggleUdpServer.Text = "Arresta Server UDP"
+        Else
+            lblServerStatus.Text = "Server UDP arrestato"
+            btnToggleUdpServer.Text = "Avvia Server UDP"
+            lstClients.Items.Clear()
+        End If
+    End Sub
     Private Sub UpdateSyncUI(offsetMs As Long, roundTripMs As Long)
         lblSyncStatus.Text = $"Sincronizzazione completata. Offset: {offsetMs} ms, RTT: {roundTripMs} ms"
+    End Sub
+
+    Private Sub btnToggleUdpServer_Click(sender As Object, e As EventArgs) Handles btnToggleUdpServer.Click
+        If btnToggleUdpServer.Text = "Avvia Server UDP" Then
+            If SpectrumBands.StartUdpServer(27759) Then
+                btnToggleUdpServer.Text = "Arresta Server UDP"
+                lblServerStatus.Text = "Server UDP in ascolto..."
+            Else
+                MessageBox.Show("Impossibile avviare il server UDP", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            End If
+        Else
+            SpectrumBands.StopUdpServer()
+            btnToggleUdpServer.Text = "Avvia Server UDP"
+            lblServerStatus.Text = "Server UDP arrestato"
+        End If
+    End Sub
+
+    Private Sub btnSyncNTP_Click(sender As Object, e As EventArgs) Handles btnSyncNTP.Click
+        If SpectrumBands.RequestNTPSyncUdp() Then
+            btnSyncNTP.Enabled = False
+            lblSyncStatus.Text = "Sincronizzazione in corso..."
+
+            ' Riabilita il pulsante dopo 5 secondi
+            Dim timer As New Timer With {.Interval = 5000}
+            AddHandler timer.Tick, Sub(s, args)
+                                       btnSyncNTP.Enabled = True
+                                       timer.Stop()
+                                       timer.Dispose()
+                                   End Sub
+            timer.Start()
+        Else
+            lblSyncStatus.Text = "Impossibile sincronizzare: client non connesso"
+        End If
     End Sub
 End Class
