@@ -221,7 +221,7 @@ Public Class Form1
             UpdateServerStatusUI(isRunning)
         End If
     End Sub
-    Private Sub OnUdpClientDisconnected(clientId As String)
+    Private Sub OnUdpClientDisconnected(clientId As String, endPointInfo As String)
         If Me.InvokeRequired Then
             Me.Invoke(Sub() RemoveClientFromList(clientId))
         Else
