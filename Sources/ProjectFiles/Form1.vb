@@ -8,6 +8,12 @@ Public Class Form1
     Private Slot_Meter As Int32
     Private Slot_Spectrum As Int32
 
+
+    Private isMeasuringStrokes As Boolean = False
+    Private locateStrokesThread As Threading.Thread = Nothing
+    Private previousBackGround As Color
+    Private previousForeColor As Color
+
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         EventsAreEnabled = False
         Load_INI()
@@ -22,6 +28,8 @@ Public Class Form1
         GroupBox3.Focus()
         Refresh()
         Opacity = 1
+
+        ReadTemplateWave()
 
         ' Registra l'handler per l'evento di sincronizzazione completata
         AddHandler SpectrumBands.SyncCompleted, AddressOf OnSyncCompleted
@@ -57,6 +65,8 @@ Public Class Form1
     '  SELECT AUDIO INPUT 
     ' ===================================================================================================
     Friend SelectedAudioIn As Int32 = 0
+    Private TemplateWave As Double()
+
     Private Sub cmb_AudioInDevices_DropDown(ByVal sender As Object, ByVal e As EventArgs)
         cmb_AudioInDevices.ItemHeight = 16
         FillAudioDevicesCombo()
@@ -127,6 +137,19 @@ Public Class Form1
                 Slots.WriteSlot(Slot_Spectrum + i, 1000.0F * SpectrumBands.m_fht.BandsBuffer(i))
             Next
         End If
+
+        txtCount.Text = m_WaveReader.Counter.ToString("0")
+        'Dim c As Double
+        'Me.Invoke(Sub()
+        '              ' codice per mostrare risultati nell'UI
+        '              c = LocateStrokes.CorrelationWithTemplate
+        '          End Sub)
+        'txtCorrelation.Text = c.ToString("0.0000")
+
+        Me.Invoke(Sub()
+                      ' codice per mostrare risultati nell'UI
+                      txtCorrelation.Text = LocateStrokes.CorrelationWithTemplate
+                  End Sub)
     End Sub
 
 
@@ -282,6 +305,114 @@ Public Class Form1
             timer.Start()
         Else
             lblSyncStatus.Text = "Impossibile sincronizzare: client non connesso"
+        End If
+    End Sub
+
+    Private Sub btnGetTemplate_Click(sender As Object, e As EventArgs) Handles btnGetTemplate.Click
+        TemplateWave = LocateStrokes.GetTemplateWave(m_WaveReader)
+    End Sub
+
+    Private Sub btnLocatestrokes_Click(sender As Object, e As EventArgs) Handles btnGetStroke.Click
+        If Not isMeasuringStrokes Then
+            isMeasuringStrokes = True
+            btnGetStroke.Text = "Stop"
+            previousBackGround = btnGetStroke.BackColor
+            previousForeColor = btnGetStroke.ForeColor
+
+            btnGetStroke.BackColor = Color.Red
+            btnGetStroke.ForeColor = Color.Yellow
+            ' Avvia in un thread separato
+            locateStrokesThread = New Threading.Thread(
+                Sub()
+                    Try
+                        ' Ciclo continuo di rilevamento fino all'interruzione
+                        While isMeasuringStrokes
+                            ' Esegui la rilevazione del colpo d'ariete
+                            Dim result = LocateStrokes.GetStroke(m_WaveReader, chkEnableServer.Checked)
+                            ' Se rileva un colpo d'ariete (result non è Nothing)
+                            If result IsNot Nothing Then
+                                ' Aggiorna l'interfaccia utente in modo thread-safe
+                                'Me.Invoke(Sub()
+                                '              ' codice per mostrare risultati nell'UI
+                                '              'txtCorrelation.Text = LocateStrokes.CorrelationWithTemplate.ToString("0.0000")
+                                '          End Sub)
+                            End If
+                            ' Piccola pausa per evitare di sovraccaricare la CPU
+                            Threading.Thread.Sleep(10)
+                        End While
+                    Catch ex As Exception
+                        ' Gestisci eccezioni in modo thread-safe
+                        Me.Invoke(Sub()
+                                      MessageBox.Show("Errore durante il rilevamento: " & ex.Message,
+                                                "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+                                  End Sub)
+                    End Try
+                End Sub)
+
+            ' Imposta il thread come background
+            locateStrokesThread.IsBackground = True
+            ' Avvia il thread
+            locateStrokesThread.Start()
+        Else
+            ' Imposta il flag per terminare il ciclo nel thread
+            isMeasuringStrokes = False
+
+            ' Attendi che il thread termini (max 1 secondo)
+            If locateStrokesThread IsNot Nothing AndAlso locateStrokesThread.IsAlive Then
+                Try
+                    locateStrokesThread.Join(1000)
+                Catch ex As Exception
+                    ' Ignora eventuali errori
+                End Try
+                locateStrokesThread = Nothing
+            End If
+
+            btnGetStroke.Text = "Locate Strokes"
+            btnGetStroke.BackColor = previousBackGround
+            btnGetStroke.ForeColor = previousForeColor
+            MessageBox.Show("Misurazione della posizione del colpo d'ariete interrotta.", "Interruzione", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
+        'LocateStrokes.GetStroke(m_WaveReader, chkEnableServer.Checked)
+    End Sub
+    Private Sub btnSaveTemplate_Click(sender As Object, e As EventArgs) Handles btnSaveTemplate.Click
+        ' Salva l'array TemplateWave in un file csv
+        If TemplateWave IsNot Nothing AndAlso TemplateWave.Length > 0 Then
+            Dim filePath = "TemplateWave.csv"
+            Using writer As New IO.StreamWriter(filePath)
+                For Each value In TemplateWave
+                    writer.WriteLine(value.ToString("F6"))
+                Next
+            End Using
+            MessageBox.Show($"Template wave salvato in {filePath}", "Salvataggio completato", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show("Nessun template wave disponibile da salvare.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Sub
+    Private Sub ReadTemplateWave()
+        ' Legge il contenuto del file TemplateWave.csv e lo carica nell'array TemplateWave
+        Dim filePath As String = "TemplateWave.csv"
+        If IO.File.Exists(filePath) Then
+            Dim lines As String() = IO.File.ReadAllLines(filePath)
+            Dim values As New List(Of Double)
+            Dim culture As Globalization.CultureInfo = Globalization.CultureInfo.CurrentCulture
+            For Each line In lines
+                Dim trimmed = line.Trim()
+                If trimmed <> "" Then
+                    Dim d As Double
+                    ' Prova prima con la cultura locale
+                    If Double.TryParse(trimmed, Globalization.NumberStyles.Any, culture, d) Then
+                        values.Add(d)
+                    ElseIf Double.TryParse(trimmed.Replace(".", culture.NumberFormat.NumberDecimalSeparator).Replace(",", culture.NumberFormat.NumberDecimalSeparator), Globalization.NumberStyles.Any, culture, d) Then
+                        ' Prova a sostituire il separatore decimale se necessario
+                        values.Add(d)
+                    End If
+                End If
+            Next
+            TemplateWave = values.ToArray()
+            LocateStrokes.NormalizedTemplateWave = TemplateWave
+            MessageBox.Show($"Template wave caricato da {filePath}", "Caricamento completato", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show($"File {filePath} non trovato.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End If
     End Sub
 End Class

@@ -40,6 +40,10 @@ Partial Class Form1
         Dim CBlendItems7 As cBlendItems = New cBlendItems()
         Dim CBlendItems8 As cBlendItems = New cBlendItems()
         Dim DesignerRectTracker8 As DesignerRectTracker = New DesignerRectTracker()
+        Dim DesignerRectTracker9 As DesignerRectTracker = New DesignerRectTracker()
+        Dim CBlendItems9 As cBlendItems = New cBlendItems()
+        Dim CBlendItems10 As cBlendItems = New cBlendItems()
+        Dim DesignerRectTracker10 As DesignerRectTracker = New DesignerRectTracker()
         Timer1 = New Timer(components)
         tk_TriggerLevel = New TrackBar()
         Label1 = New Label()
@@ -78,11 +82,17 @@ Partial Class Form1
         lblSyncStatus = New Label()
         chkEnableServer = New CheckBox()
         btn_AudioInputs = New MyButton()
-        cmb_AudioInDevices = New MyComboBox()
         GroupBox4 = New GroupBox()
+        cmb_AudioInDevices = New MyComboBox()
         lblServerStatus = New Label()
         btnSyncNTP = New Button()
         lstClients = New ListBox()
+        btnGetTemplate = New Button()
+        btnSaveTemplate = New Button()
+        txtCount = New MyTextBox()
+        btnEngageSystem = New MyButton()
+        btnGetStroke = New Button()
+        txtCorrelation = New MyTextBox()
         CType(tk_TriggerLevel, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox2.SuspendLayout()
         CType(tk_DeadTime, ComponentModel.ISupportInitialize).BeginInit()
@@ -100,13 +110,13 @@ Partial Class Form1
         ' tk_TriggerLevel
         ' 
         tk_TriggerLevel.AutoSize = False
-        tk_TriggerLevel.Location = New Point(27, 14)
-        tk_TriggerLevel.Margin = New Padding(4, 3, 4, 3)
+        tk_TriggerLevel.Location = New Point(39, 23)
+        tk_TriggerLevel.Margin = New Padding(6, 5, 6, 5)
         tk_TriggerLevel.Maximum = 999
         tk_TriggerLevel.Minimum = 1
         tk_TriggerLevel.Name = "tk_TriggerLevel"
         tk_TriggerLevel.Orientation = Orientation.Vertical
-        tk_TriggerLevel.Size = New Size(50, 103)
+        tk_TriggerLevel.Size = New Size(71, 172)
         tk_TriggerLevel.TabIndex = 15
         tk_TriggerLevel.TickFrequency = 100
         tk_TriggerLevel.TickStyle = TickStyle.Both
@@ -117,10 +127,10 @@ Partial Class Form1
         Label1.AutoSize = True
         Label1.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label1.ForeColor = Color.Black
-        Label1.Location = New Point(13, 127)
-        Label1.Margin = New Padding(4, 0, 4, 0)
+        Label1.Location = New Point(19, 212)
+        Label1.Margin = New Padding(6, 0, 6, 0)
         Label1.Name = "Label1"
-        Label1.Size = New Size(66, 13)
+        Label1.Size = New Size(102, 21)
         Label1.TabIndex = 17
         Label1.Text = "Trigger level"
         ' 
@@ -135,11 +145,11 @@ Partial Class Form1
         GroupBox2.Controls.Add(tk_TriggerLevel)
         GroupBox2.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         GroupBox2.ForeColor = Color.Navy
-        GroupBox2.Location = New Point(118, 51)
-        GroupBox2.Margin = New Padding(4, 3, 4, 3)
+        GroupBox2.Location = New Point(169, 85)
+        GroupBox2.Margin = New Padding(6, 5, 6, 5)
         GroupBox2.Name = "GroupBox2"
-        GroupBox2.Padding = New Padding(4, 3, 4, 3)
-        GroupBox2.Size = New Size(168, 150)
+        GroupBox2.Padding = New Padding(6, 5, 6, 5)
+        GroupBox2.Size = New Size(240, 250)
         GroupBox2.TabIndex = 149
         GroupBox2.TabStop = False
         GroupBox2.Text = "Counter"
@@ -149,10 +159,10 @@ Partial Class Form1
         lbl_TrigLevel.AutoSize = True
         lbl_TrigLevel.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         lbl_TrigLevel.ForeColor = Color.Black
-        lbl_TrigLevel.Location = New Point(30, 110)
-        lbl_TrigLevel.Margin = New Padding(4, 0, 4, 0)
+        lbl_TrigLevel.Location = New Point(43, 183)
+        lbl_TrigLevel.Margin = New Padding(6, 0, 6, 0)
         lbl_TrigLevel.Name = "lbl_TrigLevel"
-        lbl_TrigLevel.Size = New Size(37, 13)
+        lbl_TrigLevel.Size = New Size(55, 21)
         lbl_TrigLevel.TabIndex = 21
         lbl_TrigLevel.Text = "100uS"
         ' 
@@ -161,10 +171,10 @@ Partial Class Form1
         lbl_DeadTime.AutoSize = True
         lbl_DeadTime.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         lbl_DeadTime.ForeColor = Color.Black
-        lbl_DeadTime.Location = New Point(100, 110)
-        lbl_DeadTime.Margin = New Padding(4, 0, 4, 0)
+        lbl_DeadTime.Location = New Point(143, 183)
+        lbl_DeadTime.Margin = New Padding(6, 0, 6, 0)
         lbl_DeadTime.Name = "lbl_DeadTime"
-        lbl_DeadTime.Size = New Size(37, 13)
+        lbl_DeadTime.Size = New Size(55, 21)
         lbl_DeadTime.TabIndex = 20
         lbl_DeadTime.Text = "100uS"
         ' 
@@ -173,22 +183,22 @@ Partial Class Form1
         Label3.AutoSize = True
         Label3.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label3.ForeColor = Color.Black
-        Label3.Location = New Point(93, 127)
-        Label3.Margin = New Padding(4, 0, 4, 0)
+        Label3.Location = New Point(133, 212)
+        Label3.Margin = New Padding(6, 0, 6, 0)
         Label3.Name = "Label3"
-        Label3.Size = New Size(55, 13)
+        Label3.Size = New Size(87, 21)
         Label3.TabIndex = 19
         Label3.Text = "Dead time"
         ' 
         ' tk_DeadTime
         ' 
         tk_DeadTime.AutoSize = False
-        tk_DeadTime.Location = New Point(98, 14)
-        tk_DeadTime.Margin = New Padding(4, 3, 4, 3)
+        tk_DeadTime.Location = New Point(140, 23)
+        tk_DeadTime.Margin = New Padding(6, 5, 6, 5)
         tk_DeadTime.Maximum = 100
         tk_DeadTime.Name = "tk_DeadTime"
         tk_DeadTime.Orientation = Orientation.Vertical
-        tk_DeadTime.Size = New Size(48, 103)
+        tk_DeadTime.Size = New Size(69, 172)
         tk_DeadTime.TabIndex = 18
         tk_DeadTime.TickFrequency = 10
         tk_DeadTime.TickStyle = TickStyle.Both
@@ -202,11 +212,11 @@ Partial Class Form1
         GroupBox1.Controls.Add(Label7)
         GroupBox1.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         GroupBox1.ForeColor = Color.Navy
-        GroupBox1.Location = New Point(6, 51)
-        GroupBox1.Margin = New Padding(4, 3, 4, 3)
+        GroupBox1.Location = New Point(9, 85)
+        GroupBox1.Margin = New Padding(6, 5, 6, 5)
         GroupBox1.Name = "GroupBox1"
-        GroupBox1.Padding = New Padding(4, 3, 4, 3)
-        GroupBox1.Size = New Size(107, 150)
+        GroupBox1.Padding = New Padding(6, 5, 6, 5)
+        GroupBox1.Size = New Size(153, 250)
         GroupBox1.TabIndex = 150
         GroupBox1.TabStop = False
         GroupBox1.Text = "Outputs"
@@ -215,10 +225,10 @@ Partial Class Form1
         ' 
         Label4.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label4.ForeColor = Color.Black
-        Label4.Location = New Point(8, 98)
-        Label4.Margin = New Padding(4, 0, 4, 0)
+        Label4.Location = New Point(11, 163)
+        Label4.Margin = New Padding(6, 0, 6, 0)
         Label4.Name = "Label4"
-        Label4.Size = New Size(99, 21)
+        Label4.Size = New Size(141, 35)
         Label4.TabIndex = 131
         Label4.Text = "Spec. first slot"
         Label4.TextAlign = ContentAlignment.MiddleCenter
@@ -228,10 +238,10 @@ Partial Class Form1
         Label8.AutoSize = True
         Label8.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label8.ForeColor = Color.Black
-        Label8.Location = New Point(15, 21)
-        Label8.Margin = New Padding(4, 0, 4, 0)
+        Label8.Location = New Point(21, 35)
+        Label8.Margin = New Padding(6, 0, 6, 0)
         Label8.Name = "Label8"
-        Label8.Size = New Size(66, 13)
+        Label8.Size = New Size(100, 21)
         Label8.TabIndex = 130
         Label8.Text = "Counter slot"
         ' 
@@ -240,10 +250,10 @@ Partial Class Form1
         Label7.AutoSize = True
         Label7.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label7.ForeColor = Color.Black
-        Label7.Location = New Point(21, 59)
-        Label7.Margin = New Padding(4, 0, 4, 0)
+        Label7.Location = New Point(30, 98)
+        Label7.Margin = New Padding(6, 0, 6, 0)
         Label7.Name = "Label7"
-        Label7.Size = New Size(55, 13)
+        Label7.Size = New Size(85, 21)
         Label7.TabIndex = 128
         Label7.Text = "Meter slot"
         ' 
@@ -265,7 +275,7 @@ Partial Class Form1
         txt_SlotSpectrum.RectangleStyle = ButtonBorderStyle.Dashed
         txt_SlotSpectrum.RoundingStep = 0R
         txt_SlotSpectrum.ShadowColor = Color.LightGray
-        txt_SlotSpectrum.Size = New Size(42, 16)
+        txt_SlotSpectrum.Size = New Size(42, 24)
         txt_SlotSpectrum.TabIndex = 132
         txt_SlotSpectrum.Text = "0"
         txt_SlotSpectrum.TextAlign = HorizontalAlignment.Center
@@ -289,7 +299,7 @@ Partial Class Form1
         txt_SlotCounter.RectangleStyle = ButtonBorderStyle.Dashed
         txt_SlotCounter.RoundingStep = 0R
         txt_SlotCounter.ShadowColor = Color.LightGray
-        txt_SlotCounter.Size = New Size(42, 16)
+        txt_SlotCounter.Size = New Size(42, 24)
         txt_SlotCounter.TabIndex = 129
         txt_SlotCounter.Text = "-1"
         txt_SlotCounter.TextAlign = HorizontalAlignment.Center
@@ -313,7 +323,7 @@ Partial Class Form1
         txt_SlotMeter.RectangleStyle = ButtonBorderStyle.Dashed
         txt_SlotMeter.RoundingStep = 0R
         txt_SlotMeter.ShadowColor = Color.LightGray
-        txt_SlotMeter.Size = New Size(42, 16)
+        txt_SlotMeter.Size = New Size(42, 24)
         txt_SlotMeter.TabIndex = 127
         txt_SlotMeter.Text = "-1"
         txt_SlotMeter.TextAlign = HorizontalAlignment.Center
@@ -324,11 +334,11 @@ Partial Class Form1
         GroupBox3.Controls.Add(pBox1)
         GroupBox3.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         GroupBox3.ForeColor = Color.Navy
-        GroupBox3.Location = New Point(290, 51)
-        GroupBox3.Margin = New Padding(4, 3, 4, 3)
+        GroupBox3.Location = New Point(414, 85)
+        GroupBox3.Margin = New Padding(6, 5, 6, 5)
         GroupBox3.Name = "GroupBox3"
-        GroupBox3.Padding = New Padding(4, 3, 4, 3)
-        GroupBox3.Size = New Size(68, 150)
+        GroupBox3.Padding = New Padding(6, 5, 6, 5)
+        GroupBox3.Size = New Size(97, 250)
         GroupBox3.TabIndex = 151
         GroupBox3.TabStop = False
         GroupBox3.Text = "Meter"
@@ -336,10 +346,10 @@ Partial Class Form1
         ' pBox1
         ' 
         pBox1.BorderStyle = BorderStyle.Fixed3D
-        pBox1.Location = New Point(29, 25)
-        pBox1.Margin = New Padding(4, 3, 4, 3)
+        pBox1.Location = New Point(30, 35)
+        pBox1.Margin = New Padding(6, 5, 6, 5)
         pBox1.Name = "pBox1"
-        pBox1.Size = New Size(22, 115)
+        pBox1.Size = New Size(30, 189)
         pBox1.TabIndex = 18
         pBox1.TabStop = False
         ' 
@@ -365,10 +375,12 @@ Partial Class Form1
         GroupBox_Bands.Controls.Add(Label13)
         GroupBox_Bands.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         GroupBox_Bands.ForeColor = Color.Navy
-        GroupBox_Bands.Location = New Point(365, 6)
-        GroupBox_Bands.MinimumSize = New Size(310, 145)
+        GroupBox_Bands.Location = New Point(521, 10)
+        GroupBox_Bands.Margin = New Padding(4, 5, 4, 5)
+        GroupBox_Bands.MinimumSize = New Size(443, 242)
         GroupBox_Bands.Name = "GroupBox_Bands"
-        GroupBox_Bands.Size = New Size(596, 195)
+        GroupBox_Bands.Padding = New Padding(4, 5, 4, 5)
+        GroupBox_Bands.Size = New Size(851, 325)
         GroupBox_Bands.TabIndex = 152
         GroupBox_Bands.TabStop = False
         GroupBox_Bands.Text = "FHT Spectrum bands"
@@ -413,13 +425,14 @@ Partial Class Form1
         chk_BandsAGC.ImageAlign = ContentAlignment.MiddleCenter
         chk_BandsAGC.ImageIndex = 0
         chk_BandsAGC.ImageSize = New Size(16, 16)
-        chk_BandsAGC.Location = New Point(309, 10)
+        chk_BandsAGC.Location = New Point(441, 17)
+        chk_BandsAGC.Margin = New Padding(4, 5, 4, 5)
         chk_BandsAGC.Name = "chk_BandsAGC"
         chk_BandsAGC.Shape = MyButton.eShape.Rectangle
         chk_BandsAGC.SideImage = Nothing
         chk_BandsAGC.SideImageAlign = ContentAlignment.MiddleCenter
         chk_BandsAGC.SideImageSize = New Size(32, 32)
-        chk_BandsAGC.Size = New Size(40, 16)
+        chk_BandsAGC.Size = New Size(57, 27)
         chk_BandsAGC.TabIndex = 60
         chk_BandsAGC.Text = "AGC"
         chk_BandsAGC.TextImageRelation = TextImageRelation.ImageAboveText
@@ -465,13 +478,14 @@ Partial Class Form1
         chk_BandsLogY.ImageAlign = ContentAlignment.MiddleCenter
         chk_BandsLogY.ImageIndex = 0
         chk_BandsLogY.ImageSize = New Size(16, 16)
-        chk_BandsLogY.Location = New Point(61, 169)
+        chk_BandsLogY.Location = New Point(87, 282)
+        chk_BandsLogY.Margin = New Padding(4, 5, 4, 5)
         chk_BandsLogY.Name = "chk_BandsLogY"
         chk_BandsLogY.Shape = MyButton.eShape.Rectangle
         chk_BandsLogY.SideImage = Nothing
         chk_BandsLogY.SideImageAlign = ContentAlignment.MiddleCenter
         chk_BandsLogY.SideImageSize = New Size(32, 32)
-        chk_BandsLogY.Size = New Size(44, 16)
+        chk_BandsLogY.Size = New Size(63, 27)
         chk_BandsLogY.TabIndex = 59
         chk_BandsLogY.Text = "Log Y"
         chk_BandsLogY.TextImageRelation = TextImageRelation.ImageAboveText
@@ -518,13 +532,14 @@ Partial Class Form1
         chk_BandsLogX.ImageAlign = ContentAlignment.MiddleCenter
         chk_BandsLogX.ImageIndex = 0
         chk_BandsLogX.ImageSize = New Size(16, 16)
-        chk_BandsLogX.Location = New Point(13, 169)
+        chk_BandsLogX.Location = New Point(19, 282)
+        chk_BandsLogX.Margin = New Padding(4, 5, 4, 5)
         chk_BandsLogX.Name = "chk_BandsLogX"
         chk_BandsLogX.Shape = MyButton.eShape.Rectangle
         chk_BandsLogX.SideImage = Nothing
         chk_BandsLogX.SideImageAlign = ContentAlignment.MiddleCenter
         chk_BandsLogX.SideImageSize = New Size(32, 32)
-        chk_BandsLogX.Size = New Size(44, 16)
+        chk_BandsLogX.Size = New Size(63, 27)
         chk_BandsLogX.TabIndex = 58
         chk_BandsLogX.Text = "Log X"
         chk_BandsLogX.TextImageRelation = TextImageRelation.ImageAboveText
@@ -541,7 +556,8 @@ Partial Class Form1
         txt_BandsSpeed.Font = New Font("Tahoma", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txt_BandsSpeed.ForeColor = Color.Black
         txt_BandsSpeed.Increment = 0.02R
-        txt_BandsSpeed.Location = New Point(83, 127)
+        txt_BandsSpeed.Location = New Point(119, 212)
+        txt_BandsSpeed.Margin = New Padding(4, 5, 4, 5)
         txt_BandsSpeed.MaxValue = 100R
         txt_BandsSpeed.MinValue = 1R
         txt_BandsSpeed.Name = "txt_BandsSpeed"
@@ -551,7 +567,7 @@ Partial Class Form1
         txt_BandsSpeed.RectangleStyle = ButtonBorderStyle.Dashed
         txt_BandsSpeed.RoundingStep = 0R
         txt_BandsSpeed.ShadowColor = Color.LightGray
-        txt_BandsSpeed.Size = New Size(46, 16)
+        txt_BandsSpeed.Size = New Size(66, 24)
         txt_BandsSpeed.TabIndex = 55
         txt_BandsSpeed.Text = "10"
         txt_BandsSpeed.TextAlign = HorizontalAlignment.Center
@@ -560,10 +576,10 @@ Partial Class Form1
         ' 
         Label5.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label5.ForeColor = Color.Black
-        Label5.Location = New Point(9, 130)
-        Label5.Margin = New Padding(4, 0, 4, 0)
+        Label5.Location = New Point(13, 217)
+        Label5.Margin = New Padding(6, 0, 6, 0)
         Label5.Name = "Label5"
-        Label5.Size = New Size(63, 15)
+        Label5.Size = New Size(90, 25)
         Label5.TabIndex = 44
         Label5.Text = "Speed"
         Label5.TextAlign = ContentAlignment.MiddleRight
@@ -572,10 +588,10 @@ Partial Class Form1
         ' 
         pbox_SpectrumBars.Anchor = AnchorStyles.Top Or AnchorStyles.Bottom Or AnchorStyles.Left Or AnchorStyles.Right
         pbox_SpectrumBars.BorderStyle = BorderStyle.Fixed3D
-        pbox_SpectrumBars.Location = New Point(157, 37)
-        pbox_SpectrumBars.Margin = New Padding(4, 3, 4, 3)
+        pbox_SpectrumBars.Location = New Point(224, 62)
+        pbox_SpectrumBars.Margin = New Padding(6, 5, 6, 5)
         pbox_SpectrumBars.Name = "pbox_SpectrumBars"
-        pbox_SpectrumBars.Size = New Size(439, 108)
+        pbox_SpectrumBars.Size = New Size(625, 177)
         pbox_SpectrumBars.TabIndex = 0
         pbox_SpectrumBars.TabStop = False
         ' 
@@ -583,10 +599,10 @@ Partial Class Form1
         ' 
         Label10.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label10.ForeColor = Color.Black
-        Label10.Location = New Point(13, 37)
-        Label10.Margin = New Padding(4, 0, 4, 0)
+        Label10.Location = New Point(19, 62)
+        Label10.Margin = New Padding(6, 0, 6, 0)
         Label10.Name = "Label10"
-        Label10.Size = New Size(63, 15)
+        Label10.Size = New Size(90, 25)
         Label10.TabIndex = 34
         Label10.Text = "Max dB"
         Label10.TextAlign = ContentAlignment.MiddleRight
@@ -595,10 +611,10 @@ Partial Class Form1
         ' 
         Label6.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label6.ForeColor = Color.Black
-        Label6.Location = New Point(157, 9)
-        Label6.Margin = New Padding(4, 0, 4, 0)
+        Label6.Location = New Point(224, 15)
+        Label6.Margin = New Padding(6, 0, 6, 0)
         Label6.Name = "Label6"
-        Label6.Size = New Size(63, 15)
+        Label6.Size = New Size(90, 25)
         Label6.TabIndex = 30
         Label6.Text = "Bands"
         Label6.TextAlign = ContentAlignment.MiddleRight
@@ -613,7 +629,8 @@ Partial Class Form1
         txt_BandsMaxDb.Font = New Font("Tahoma", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txt_BandsMaxDb.ForeColor = Color.Black
         txt_BandsMaxDb.Increment = 0.1R
-        txt_BandsMaxDb.Location = New Point(83, 39)
+        txt_BandsMaxDb.Location = New Point(119, 65)
+        txt_BandsMaxDb.Margin = New Padding(4, 5, 4, 5)
         txt_BandsMaxDb.MaxValue = 0R
         txt_BandsMaxDb.MinValue = -120R
         txt_BandsMaxDb.Name = "txt_BandsMaxDb"
@@ -623,7 +640,7 @@ Partial Class Form1
         txt_BandsMaxDb.RectangleStyle = ButtonBorderStyle.Dashed
         txt_BandsMaxDb.RoundingStep = 0R
         txt_BandsMaxDb.ShadowColor = Color.LightGray
-        txt_BandsMaxDb.Size = New Size(46, 16)
+        txt_BandsMaxDb.Size = New Size(66, 24)
         txt_BandsMaxDb.TabIndex = 51
         txt_BandsMaxDb.Text = "-20"
         txt_BandsMaxDb.TextAlign = HorizontalAlignment.Center
@@ -632,10 +649,10 @@ Partial Class Form1
         ' 
         Label14.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label14.ForeColor = Color.Black
-        Label14.Location = New Point(13, 83)
-        Label14.Margin = New Padding(4, 0, 4, 0)
+        Label14.Location = New Point(19, 138)
+        Label14.Margin = New Padding(6, 0, 6, 0)
         Label14.Name = "Label14"
-        Label14.Size = New Size(63, 15)
+        Label14.Size = New Size(90, 25)
         Label14.TabIndex = 38
         Label14.Text = "Max freq."
         Label14.TextAlign = ContentAlignment.MiddleRight
@@ -650,7 +667,8 @@ Partial Class Form1
         txt_BandsCount.Font = New Font("Tahoma", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txt_BandsCount.ForeColor = Color.Black
         txt_BandsCount.Increment = 0.1R
-        txt_BandsCount.Location = New Point(227, 9)
+        txt_BandsCount.Location = New Point(324, 15)
+        txt_BandsCount.Margin = New Padding(4, 5, 4, 5)
         txt_BandsCount.MaxValue = 100R
         txt_BandsCount.MinValue = 1R
         txt_BandsCount.Name = "txt_BandsCount"
@@ -660,7 +678,7 @@ Partial Class Form1
         txt_BandsCount.RectangleStyle = ButtonBorderStyle.Dashed
         txt_BandsCount.RoundingStep = 0R
         txt_BandsCount.ShadowColor = Color.LightGray
-        txt_BandsCount.Size = New Size(46, 16)
+        txt_BandsCount.Size = New Size(66, 24)
         txt_BandsCount.TabIndex = 50
         txt_BandsCount.Text = "3"
         txt_BandsCount.TextAlign = HorizontalAlignment.Center
@@ -675,7 +693,8 @@ Partial Class Form1
         txt_BandsMaxFreq.Font = New Font("Tahoma", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txt_BandsMaxFreq.ForeColor = Color.Black
         txt_BandsMaxFreq.Increment = 0.1R
-        txt_BandsMaxFreq.Location = New Point(83, 83)
+        txt_BandsMaxFreq.Location = New Point(119, 138)
+        txt_BandsMaxFreq.Margin = New Padding(4, 5, 4, 5)
         txt_BandsMaxFreq.MaxValue = 22000R
         txt_BandsMaxFreq.MinValue = 1R
         txt_BandsMaxFreq.Name = "txt_BandsMaxFreq"
@@ -685,7 +704,7 @@ Partial Class Form1
         txt_BandsMaxFreq.RectangleStyle = ButtonBorderStyle.Dashed
         txt_BandsMaxFreq.RoundingStep = 0R
         txt_BandsMaxFreq.ShadowColor = Color.LightGray
-        txt_BandsMaxFreq.Size = New Size(46, 16)
+        txt_BandsMaxFreq.Size = New Size(66, 24)
         txt_BandsMaxFreq.TabIndex = 53
         txt_BandsMaxFreq.Text = "16000"
         txt_BandsMaxFreq.TextAlign = HorizontalAlignment.Center
@@ -700,7 +719,8 @@ Partial Class Form1
         txt_BandsMinDb.Font = New Font("Tahoma", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txt_BandsMinDb.ForeColor = Color.Black
         txt_BandsMinDb.Increment = 0.1R
-        txt_BandsMinDb.Location = New Point(83, 61)
+        txt_BandsMinDb.Location = New Point(119, 102)
+        txt_BandsMinDb.Margin = New Padding(4, 5, 4, 5)
         txt_BandsMinDb.MaxValue = 0R
         txt_BandsMinDb.MinValue = -120R
         txt_BandsMinDb.Name = "txt_BandsMinDb"
@@ -710,7 +730,7 @@ Partial Class Form1
         txt_BandsMinDb.RectangleStyle = ButtonBorderStyle.Dashed
         txt_BandsMinDb.RoundingStep = 0R
         txt_BandsMinDb.ShadowColor = Color.LightGray
-        txt_BandsMinDb.Size = New Size(46, 16)
+        txt_BandsMinDb.Size = New Size(66, 24)
         txt_BandsMinDb.TabIndex = 52
         txt_BandsMinDb.Text = "-40"
         txt_BandsMinDb.TextAlign = HorizontalAlignment.Center
@@ -725,7 +745,8 @@ Partial Class Form1
         txt_BandsMinFreq.Font = New Font("Tahoma", 9.75F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         txt_BandsMinFreq.ForeColor = Color.Black
         txt_BandsMinFreq.Increment = 0.1R
-        txt_BandsMinFreq.Location = New Point(83, 105)
+        txt_BandsMinFreq.Location = New Point(119, 175)
+        txt_BandsMinFreq.Margin = New Padding(4, 5, 4, 5)
         txt_BandsMinFreq.MaxValue = 22000R
         txt_BandsMinFreq.MinValue = 1R
         txt_BandsMinFreq.Name = "txt_BandsMinFreq"
@@ -735,7 +756,7 @@ Partial Class Form1
         txt_BandsMinFreq.RectangleStyle = ButtonBorderStyle.Dashed
         txt_BandsMinFreq.RoundingStep = 0R
         txt_BandsMinFreq.ShadowColor = Color.LightGray
-        txt_BandsMinFreq.Size = New Size(46, 16)
+        txt_BandsMinFreq.Size = New Size(66, 24)
         txt_BandsMinFreq.TabIndex = 54
         txt_BandsMinFreq.Text = "80"
         txt_BandsMinFreq.TextAlign = HorizontalAlignment.Center
@@ -744,10 +765,10 @@ Partial Class Form1
         ' 
         Label12.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label12.ForeColor = Color.Black
-        Label12.Location = New Point(13, 106)
-        Label12.Margin = New Padding(4, 0, 4, 0)
+        Label12.Location = New Point(19, 177)
+        Label12.Margin = New Padding(6, 0, 6, 0)
         Label12.Name = "Label12"
-        Label12.Size = New Size(63, 15)
+        Label12.Size = New Size(90, 25)
         Label12.TabIndex = 40
         Label12.Text = "Min freq."
         Label12.TextAlign = ContentAlignment.MiddleRight
@@ -756,19 +777,20 @@ Partial Class Form1
         ' 
         Label13.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
         Label13.ForeColor = Color.Black
-        Label13.Location = New Point(13, 59)
-        Label13.Margin = New Padding(4, 0, 4, 0)
+        Label13.Location = New Point(19, 98)
+        Label13.Margin = New Padding(6, 0, 6, 0)
         Label13.Name = "Label13"
-        Label13.Size = New Size(63, 15)
+        Label13.Size = New Size(90, 25)
         Label13.TabIndex = 36
         Label13.Text = "Min dB"
         Label13.TextAlign = ContentAlignment.MiddleRight
         ' 
         ' btnToggleUdpServer
         ' 
-        btnToggleUdpServer.Location = New Point(257, 368)
+        btnToggleUdpServer.Location = New Point(367, 613)
+        btnToggleUdpServer.Margin = New Padding(4, 5, 4, 5)
         btnToggleUdpServer.Name = "btnToggleUdpServer"
-        btnToggleUdpServer.Size = New Size(75, 23)
+        btnToggleUdpServer.Size = New Size(107, 38)
         btnToggleUdpServer.TabIndex = 238
         btnToggleUdpServer.Text = "Server UDP"
         btnToggleUdpServer.UseVisualStyleBackColor = True
@@ -776,18 +798,20 @@ Partial Class Form1
         ' lblSyncStatus
         ' 
         lblSyncStatus.AutoSize = True
-        lblSyncStatus.Location = New Point(257, 310)
+        lblSyncStatus.Location = New Point(367, 517)
+        lblSyncStatus.Margin = New Padding(4, 0, 4, 0)
         lblSyncStatus.Name = "lblSyncStatus"
-        lblSyncStatus.Size = New Size(77, 15)
+        lblSyncStatus.Size = New Size(115, 25)
         lblSyncStatus.TabIndex = 237
         lblSyncStatus.Text = "lblSyncStatus"
         ' 
         ' chkEnableServer
         ' 
         chkEnableServer.AutoSize = True
-        chkEnableServer.Location = New Point(257, 276)
+        chkEnableServer.Location = New Point(367, 460)
+        chkEnableServer.Margin = New Padding(4, 5, 4, 5)
         chkEnableServer.Name = "chkEnableServer"
-        chkEnableServer.Size = New Size(58, 19)
+        chkEnableServer.Size = New Size(87, 29)
         chkEnableServer.TabIndex = 236
         chkEnableServer.Text = "Server"
         chkEnableServer.UseVisualStyleBackColor = True
@@ -831,18 +855,35 @@ Partial Class Form1
         btn_AudioInputs.ImageAlign = ContentAlignment.MiddleCenter
         btn_AudioInputs.ImageIndex = 0
         btn_AudioInputs.ImageSize = New Size(16, 16)
-        btn_AudioInputs.Location = New Point(220, 10)
+        btn_AudioInputs.Location = New Point(314, 17)
+        btn_AudioInputs.Margin = New Padding(4, 5, 4, 5)
         btn_AudioInputs.Name = "btn_AudioInputs"
         btn_AudioInputs.Shape = MyButton.eShape.Rectangle
         btn_AudioInputs.SideImage = Nothing
         btn_AudioInputs.SideImageAlign = ContentAlignment.MiddleCenter
         btn_AudioInputs.SideImageSize = New Size(32, 32)
-        btn_AudioInputs.Size = New Size(79, 18)
+        btn_AudioInputs.Size = New Size(113, 30)
         btn_AudioInputs.TabIndex = 233
         btn_AudioInputs.Text = "Audio inputs"
         btn_AudioInputs.TextImageRelation = TextImageRelation.ImageAboveText
         btn_AudioInputs.TextMargin = New Padding(0)
         btn_AudioInputs.TextShadow = Color.Transparent
+        ' 
+        ' GroupBox4
+        ' 
+        GroupBox4.BackColor = Color.LightGoldenrodYellow
+        GroupBox4.Controls.Add(cmb_AudioInDevices)
+        GroupBox4.Controls.Add(btn_AudioInputs)
+        GroupBox4.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
+        GroupBox4.ForeColor = Color.Navy
+        GroupBox4.Location = New Point(10, 10)
+        GroupBox4.Margin = New Padding(4, 5, 4, 5)
+        GroupBox4.Name = "GroupBox4"
+        GroupBox4.Padding = New Padding(4, 5, 4, 5)
+        GroupBox4.Size = New Size(441, 65)
+        GroupBox4.TabIndex = 235
+        GroupBox4.TabStop = False
+        GroupBox4.Text = "Input"
         ' 
         ' cmb_AudioInDevices
         ' 
@@ -868,41 +909,30 @@ Partial Class Form1
         cmb_AudioInDevices.IntegralHeight = False
         cmb_AudioInDevices.ItemHeight = 11
         cmb_AudioInDevices.Items.AddRange(New Object() {"Auto"})
-        cmb_AudioInDevices.Location = New Point(62, 11)
+        cmb_AudioInDevices.Location = New Point(80, 27)
+        cmb_AudioInDevices.Margin = New Padding(4, 5, 4, 5)
         cmb_AudioInDevices.Name = "cmb_AudioInDevices"
         cmb_AudioInDevices.ShadowColor = Color.LightGray
-        cmb_AudioInDevices.Size = New Size(141, 17)
+        cmb_AudioInDevices.Size = New Size(200, 17)
         cmb_AudioInDevices.TabIndex = 234
         cmb_AudioInDevices.TextPosition = 1
-        ' 
-        ' GroupBox4
-        ' 
-        GroupBox4.BackColor = Color.LightGoldenrodYellow
-        GroupBox4.Controls.Add(cmb_AudioInDevices)
-        GroupBox4.Controls.Add(btn_AudioInputs)
-        GroupBox4.Font = New Font("Tahoma", 8.25F, FontStyle.Regular, GraphicsUnit.Point, CByte(0))
-        GroupBox4.ForeColor = Color.Navy
-        GroupBox4.Location = New Point(7, 6)
-        GroupBox4.Name = "GroupBox4"
-        GroupBox4.Size = New Size(309, 34)
-        GroupBox4.TabIndex = 235
-        GroupBox4.TabStop = False
-        GroupBox4.Text = "Input"
         ' 
         ' lblServerStatus
         ' 
         lblServerStatus.AutoSize = True
-        lblServerStatus.Location = New Point(257, 338)
+        lblServerStatus.Location = New Point(367, 563)
+        lblServerStatus.Margin = New Padding(4, 0, 4, 0)
         lblServerStatus.Name = "lblServerStatus"
-        lblServerStatus.Size = New Size(84, 15)
+        lblServerStatus.Size = New Size(128, 25)
         lblServerStatus.TabIndex = 239
         lblServerStatus.Text = "lblServerStatus"
         ' 
         ' btnSyncNTP
         ' 
-        btnSyncNTP.Location = New Point(257, 236)
+        btnSyncNTP.Location = New Point(367, 393)
+        btnSyncNTP.Margin = New Padding(4, 5, 4, 5)
         btnSyncNTP.Name = "btnSyncNTP"
-        btnSyncNTP.Size = New Size(75, 23)
+        btnSyncNTP.Size = New Size(107, 38)
         btnSyncNTP.TabIndex = 240
         btnSyncNTP.Text = "Sync"
         btnSyncNTP.UseVisualStyleBackColor = True
@@ -910,18 +940,141 @@ Partial Class Form1
         ' lstClients
         ' 
         lstClients.FormattingEnabled = True
-        lstClients.ItemHeight = 15
-        lstClients.Location = New Point(404, 231)
+        lstClients.ItemHeight = 25
+        lstClients.Location = New Point(577, 385)
+        lstClients.Margin = New Padding(4, 5, 4, 5)
         lstClients.Name = "lstClients"
-        lstClients.Size = New Size(120, 94)
+        lstClients.Size = New Size(170, 154)
         lstClients.TabIndex = 241
+        ' 
+        ' btnGetTemplate
+        ' 
+        btnGetTemplate.Location = New Point(233, 393)
+        btnGetTemplate.Margin = New Padding(4, 5, 4, 5)
+        btnGetTemplate.Name = "btnGetTemplate"
+        btnGetTemplate.Size = New Size(107, 67)
+        btnGetTemplate.TabIndex = 242
+        btnGetTemplate.Text = "Get template"
+        btnGetTemplate.UseVisualStyleBackColor = True
+        ' 
+        ' btnSaveTemplate
+        ' 
+        btnSaveTemplate.Location = New Point(233, 475)
+        btnSaveTemplate.Margin = New Padding(4, 5, 4, 5)
+        btnSaveTemplate.Name = "btnSaveTemplate"
+        btnSaveTemplate.Size = New Size(107, 67)
+        btnSaveTemplate.TabIndex = 243
+        btnSaveTemplate.Text = "Save Template"
+        btnSaveTemplate.UseVisualStyleBackColor = True
+        ' 
+        ' txtCount
+        ' 
+        txtCount.ArrowsIncrement = 0R
+        txtCount.BackColor_Over = SystemColors.Window
+        txtCount.Increment = 0R
+        txtCount.Location = New Point(58, 397)
+        txtCount.MaxValue = 100R
+        txtCount.MinValue = 0R
+        txtCount.Name = "txtCount"
+        txtCount.NumericValue = 0R
+        txtCount.RectangleColor = Color.Transparent
+        txtCount.RectangleStyle = ButtonBorderStyle.None
+        txtCount.RoundingStep = 0R
+        txtCount.ShadowColor = Color.Transparent
+        txtCount.Size = New Size(150, 31)
+        txtCount.TabIndex = 244
+        txtCount.Text = "0"
+        ' 
+        ' btnEngageSystem
+        ' 
+        btnEngageSystem.BackColor = Color.WhiteSmoke
+        btnEngageSystem.BorderColor = Color.DarkGray
+        DesignerRectTracker9.IsActive = False
+        DesignerRectTracker9.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker9.TrackerRectangle"), RectangleF)
+        btnEngageSystem.CenterPtTracker = DesignerRectTracker9
+        CBlendItems9.iColor = New Color() {Color.AliceBlue, Color.RoyalBlue, Color.Navy}
+        CBlendItems9.iPoint = New Single() {0F, 0.5F, 1F}
+        btnEngageSystem.ColorFillBlend = CBlendItems9
+        CBlendItems10.iColor = New Color() {Color.Red, Color.Orange, Color.Orange}
+        CBlendItems10.iPoint = New Single() {0F, 0.5F, 1F}
+        btnEngageSystem.ColorFillBlendChecked = CBlendItems10
+        btnEngageSystem.ColorFillSolid = SystemColors.Control
+        btnEngageSystem.ColorFillSolidChecked = SystemColors.Control
+        btnEngageSystem.Corners.All = 6S
+        btnEngageSystem.Corners.LowerLeft = 6S
+        btnEngageSystem.Corners.LowerRight = 6S
+        btnEngageSystem.Corners.UpperLeft = 6S
+        btnEngageSystem.Corners.UpperRight = 6S
+        btnEngageSystem.FillType = MyButton.eFillType.LinearVertical
+        btnEngageSystem.FillTypeChecked = MyButton.eFillType.LinearHorizontal
+        btnEngageSystem.FocalPoints.CenterPtX = 0.5F
+        btnEngageSystem.FocalPoints.CenterPtY = 0.5F
+        btnEngageSystem.FocalPoints.FocusPtX = 0F
+        btnEngageSystem.FocalPoints.FocusPtY = 0F
+        btnEngageSystem.FocalPointsChecked.CenterPtX = 0.5F
+        btnEngageSystem.FocalPointsChecked.CenterPtY = 0.5F
+        btnEngageSystem.FocalPointsChecked.FocusPtX = 0F
+        btnEngageSystem.FocalPointsChecked.FocusPtY = 0F
+        DesignerRectTracker10.IsActive = False
+        DesignerRectTracker10.TrackerRectangle = CType(resources.GetObject("DesignerRectTracker10.TrackerRectangle"), RectangleF)
+        btnEngageSystem.FocusPtTracker = DesignerRectTracker10
+        btnEngageSystem.ForeColor = Color.Navy
+        btnEngageSystem.Image = Nothing
+        btnEngageSystem.ImageAlign = ContentAlignment.MiddleCenter
+        btnEngageSystem.ImageIndex = 0
+        btnEngageSystem.ImageSize = New Size(16, 16)
+        btnEngageSystem.Location = New Point(75, 447)
+        btnEngageSystem.Name = "btnEngageSystem"
+        btnEngageSystem.Shape = MyButton.eShape.Rectangle
+        btnEngageSystem.SideImage = Nothing
+        btnEngageSystem.SideImageSize = New Size(48, 48)
+        btnEngageSystem.Size = New Size(112, 95)
+        btnEngageSystem.TabIndex = 245
+        btnEngageSystem.Text = "Engage System"
+        btnEngageSystem.TextImageRelation = TextImageRelation.Overlay
+        btnEngageSystem.TextMargin = New Padding(0)
+        btnEngageSystem.TextShadow = Color.Transparent
+        ' 
+        ' btnGetStroke
+        ' 
+        btnGetStroke.Location = New Point(233, 563)
+        btnGetStroke.Margin = New Padding(4, 5, 4, 5)
+        btnGetStroke.Name = "btnGetStroke"
+        btnGetStroke.Size = New Size(107, 67)
+        btnGetStroke.TabIndex = 246
+        btnGetStroke.Text = "Locate Strokes"
+        btnGetStroke.UseVisualStyleBackColor = True
+        ' 
+        ' txtCorrelation
+        ' 
+        txtCorrelation.ArrowsIncrement = 0R
+        txtCorrelation.BackColor_Over = SystemColors.Window
+        txtCorrelation.Increment = 0R
+        txtCorrelation.Location = New Point(58, 572)
+        txtCorrelation.MaxValue = 100R
+        txtCorrelation.MinValue = 0R
+        txtCorrelation.Name = "txtCorrelation"
+        txtCorrelation.NumericValue = 0R
+        txtCorrelation.RectangleColor = Color.Transparent
+        txtCorrelation.RectangleStyle = ButtonBorderStyle.None
+        txtCorrelation.RoundingStep = 0R
+        txtCorrelation.ShadowColor = Color.Transparent
+        txtCorrelation.Size = New Size(150, 31)
+        txtCorrelation.TabIndex = 247
+        txtCorrelation.Text = "0"
         ' 
         ' Form1
         ' 
-        AutoScaleDimensions = New SizeF(7F, 15F)
+        AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.AliceBlue
-        ClientSize = New Size(998, 403)
+        ClientSize = New Size(1426, 672)
+        Controls.Add(txtCorrelation)
+        Controls.Add(btnGetStroke)
+        Controls.Add(btnEngageSystem)
+        Controls.Add(txtCount)
+        Controls.Add(btnSaveTemplate)
+        Controls.Add(btnGetTemplate)
         Controls.Add(lstClients)
         Controls.Add(btnSyncNTP)
         Controls.Add(lblServerStatus)
@@ -935,7 +1088,7 @@ Partial Class Form1
         Controls.Add(GroupBox2)
         FormBorderStyle = FormBorderStyle.Fixed3D
         Icon = CType(resources.GetObject("$this.Icon"), Icon)
-        Margin = New Padding(4, 3, 4, 3)
+        Margin = New Padding(6, 5, 6, 5)
         Name = "Form1"
         Opacity = 0R
         StartPosition = FormStartPosition.Manual
@@ -991,7 +1144,6 @@ Partial Class Form1
     Friend WithEvents Label13 As System.Windows.Forms.Label
     Friend WithEvents chk_BandsAGC As MyButton
     Friend WithEvents btn_AudioInputs As MyButton
-    Friend WithEvents cmb_AudioInDevices As MyComboBox
     Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
     Friend WithEvents chkEnableServer As CheckBox
     Friend WithEvents lblSyncStatus As Label
@@ -999,4 +1151,11 @@ Partial Class Form1
     Friend WithEvents lblServerStatus As Label
     Friend WithEvents btnSyncNTP As Button
     Friend WithEvents lstClients As ListBox
+    Friend WithEvents cmb_AudioInDevices As MyComboBox
+    Friend WithEvents btnGetTemplate As Button
+    Friend WithEvents btnSaveTemplate As Button
+    Friend WithEvents txtCount As MyTextBox
+    Friend WithEvents btnEngageSystem As MyButton
+    Friend WithEvents btnGetStroke As Button
+    Friend WithEvents txtCorrelation As MyTextBox
 End Class

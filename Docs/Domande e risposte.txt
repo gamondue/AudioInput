@@ -1,0 +1,82 @@
+Qual è la migliore metrica per dire se due curve che sono rappresentate per punti in due vettori sono sufficientemente simili, al netto di una traslazione?
+Per confrontare la similarità tra due curve rappresentate da punti in due vettori, tenendo conto di una possibile traslazione (cioè uno spostamento verticale o orizzontale), le metriche più usate sono:
+1. Distanza Euclidea dopo allineamento
+•	Si calcola la distanza Euclidea tra i vettori dopo averli allineati tramite traslazione (ad esempio, sottraendo la media o trovando lo shift che minimizza la distanza).
+•	Pro: Semplice e veloce.
+•	Contro: Sensibile a rumore e deformazioni locali.
+2. Cross-correlation (Correlazione incrociata)
+•	Si calcola la correlazione incrociata tra i due vettori. Il massimo della correlazione indica il miglior allineamento (traslazione) e il valore massimo indica la similarità.
+•	Pro: Invariante rispetto alla traslazione orizzontale, molto usata in analisi di segnali.
+•	Contro: Non gestisce bene deformazioni non lineari.
+3. Dynamic Time Warping (DTW)
+•	Permette di confrontare curve che possono essere "dilatate" o "compresse" localmente, non solo traslate.
+•	Pro: Robusto a variazioni locali e traslazioni.
+•	Contro: Più complesso computazionalmente.
+---
+Consiglio pratico
+Per la maggior parte delle applicazioni audio o spettrogrammi (come nel tuo contesto), la correlazione incrociata è la scelta migliore per similarità con traslazione orizzontale:
+
+...
+Segue codice simile a quello che ho messo nel programma 
+...
+
+Se invece la traslazione è solo verticale (offset costante), puoi semplicemente sottrarre la media da entrambi i vettori prima di confrontarli.
+---
+In sintesi:
+•	Se la traslazione è orizzontale: usa la correlazione incrociata.
+•	Se la traslazione è verticale: sottrai la media e poi usa la distanza Euclidea o la correlazione.
+•	Se ci sono deformazioni locali: considera il DTW.
+
+
+Ho due curve rappresentate per punti, contenute in due vettori dello stesso numero di dimensioni. Le curve sono simili ma non identiche. Esse sono registrazioni audio dello stesso fenomeno, che arrivano in momenti diversi al microfono che le ha registrate. Devo detarminare la differenza di tempo di cui le due curve sono traslate
+
+Per determinare la differenza di tempo (ritardo) tra due curve audio rappresentate da vettori di uguale lunghezza, la tecnica standard è la correlazione incrociata. Questa ti permette di trovare lo shift (in campioni) che massimizza la similarità tra i due segnali, cioè il ritardo temporale tra le due registrazioni.
+Passaggi:
+1.	Calcola la correlazione incrociata tra i due vettori.
+2.	Trova l’indice in cui la correlazione è massima.
+3.	Converti l’indice di shift in tempo, usando la frequenza di campionamento.
+
+...
+Segue il codice che ho messo nel programma 
+...
+
+---
+In sintesi:
+La correlazione incrociata è la metrica migliore per stimare il ritardo temporale tra due curve audio simili ma traslate.
+
+
+Queste due curve sono "colpi" che si generano in una tubatura; supponendo di avere una registrazione di un "colpo" tipico, come faccio a dire se il suono che ho appena registrato è un "colpo" o no (tieni presenti che ho già il software per l'analisi armonica, come puoi vedere dal mio codice)?
+Per riconoscere se un suono appena registrato è un "colpo" simile a uno tipico, puoi utilizzare un approccio di template matching basato sulla correlazione incrociata, sfruttando la funzione che hai già implementato (CalcolaRitardoCrossCorrelation).
+Ecco una procedura semplice ed efficace:
+---
+1. Normalizza i segnali
+Assicurati che sia il "colpo" tipico che il segnale da analizzare siano normalizzati (ad esempio, portando il massimo valore assoluto a 1). Questo rende la correlazione più robusta rispetto all’ampiezza.
+2. Calcola la correlazione incrociata
+Usa la correlazione incrociata tra il segnale tipico e quello appena registrato.
+3. Valuta il massimo della correlazione
+Se il massimo valore della correlazione supera una certa soglia (ad esempio 0.7 o 0.8, da tarare sperimentalmente), puoi considerare il suono come un "colpo".
+
+...
+Segue il codice che ho messo nel programma 
+...
+
+---
+Nota:
+•	La soglia va tarata in base ai tuoi dati reali.
+•	Se vuoi maggiore robustezza, puoi anche confrontare le bande armoniche (spettri) invece dei segnali grezzi, usando la stessa logica.
+Se vuoi un esempio su come confrontare i vettori spettrali invece dei segnali audio, chiedi pure!
+Nota:
+•	La soglia va tarata in base ai tuoi dati reali.
+•	Se vuoi maggiore robustezza, puoi anche confrontare le bande armoniche (spettri) invece dei segnali grezzi, usando la stessa logica.
+Se vuoi un esempio su come confrontare i vettori spettrali invece dei segnali audio, chiedi pure!
+
+
+Un'onda acustica che si propaga in un muro solido, ha "rallentamenti" nell'attraversare gli angoli dei piani?
+Un’onda acustica che si propaga in un muro solido può subire effetti particolari quando incontra angoli o cambiamenti di direzione nei piani, ma non si parla propriamente di “rallentamenti” nel senso di una diminuzione della velocità di propagazione del suono nel materiale.
+Cosa succede agli angoli:
+•	Diffrazione e riflessione: L’onda può essere riflessa, diffusa o parzialmente trasmessa in direzioni diverse. Questo può ridurre l’energia trasmessa nella direzione originale, ma la velocità di propagazione nel materiale resta la stessa.
+•	Perdita di energia: Una parte dell’energia può essere dispersa o riflessa, quindi il segnale può risultare attenuato dopo aver attraversato uno o più angoli.
+•	Effetti geometrici: In presenza di angoli acuti o cambi di sezione, possono crearsi onde stazionarie o fenomeni di interferenza, ma la velocità del suono nel materiale (ad esempio cemento, acciaio, ecc.) non cambia.
+In sintesi:
+L’onda non “rallenta” agli angoli, ma può subire attenuazione, riflessione o dispersione. La velocità di propagazione dipende solo dal materiale, non dalla geometria del percorso, salvo effetti secondari dovuti a fenomeni di diffrazione o riflessione.
+Se ti serve modellare questi effetti nel software, puoi considerare una perdita di ampiezza o energia agli angoli, ma non una variazione della velocità.

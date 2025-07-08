@@ -14,6 +14,9 @@ Class WaveReader
     Private m_Recorder As AudioIn = New AudioIn
     Private m_RecBuffer As Int16()
     Private m_DeadTimeCounter As Int32
+    Private bigEnough As Boolean = False
+    Friend isOverThreshold As Boolean = False
+    Friend outBuffer As Int16()
 
     Friend Property DeadTime_uS() As Single
         Get
@@ -38,9 +41,12 @@ Class WaveReader
         Dim MaxValue As Int32 = -999999
         Dim MinValue As Int32 = 999999
         Dim v As Int32
+        Dim bigEnough As Boolean = False
+        outBuffer = New Int16(m_RecBuffer.Length - 1) {}
         For i As Integer = 0 To m_RecBuffer.Length - 1
             ' ----------------------------------------------------------------
             v = m_RecBuffer(i)
+            outBuffer(i) = m_RecBuffer(i)
             ' ----------------------------------------------------------------
             If v > MaxValue Then MaxValue = v
             If v < MinValue Then MinValue = v
@@ -52,9 +58,16 @@ Class WaveReader
                     Counter += 1
                     If Counter > 65535 Then Counter = 0
                     m_DeadTimeCounter = mDeadTimeSamples
+                    bigEnough = True
                 End If
             End If
         Next
+        If bigEnough Then
+            isOverThreshold = True
+        Else
+            outBuffer = Nothing
+            isOverThreshold = False
+        End If
         '
         Dim vpp As Single = (MaxValue - MinValue) / 60000.0F
         If vpp < 0.00001 Then vpp = 0.00001

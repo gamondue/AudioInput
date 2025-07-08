@@ -43,5 +43,4 @@ Class MultimediaTimer
             m_hMMTimer = 0
         End If
     End Sub
-
 End Class

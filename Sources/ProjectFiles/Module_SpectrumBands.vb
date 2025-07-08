@@ -24,7 +24,7 @@ Namespace SpectrumBands
         Private m_Recorder As AudioIn
         Private m_InputBuffer() As Int16
 
-        Private m_netTransfer As Class_NetTransferTCP
+        Private m_netTransfer As NetTransfer_Tcp
 
         Private m_ddx As Int32
         Private m_ddy As Int32
@@ -104,7 +104,7 @@ Namespace SpectrumBands
                                New AudioIn.BufferDoneEventHandler(AddressOf DataArrived))
 
             ' Inizializza la connessione TCP
-            m_netTransfer = New Class_NetTransferTCP(tcpServerAddress, tcpServerPort)
+            m_netTransfer = New NetTransfer_Tcp(tcpServerAddress, tcpServerPort)
             m_netTransfer.Connect()
         End Sub
 
@@ -190,7 +190,7 @@ Namespace SpectrumBands
             If isServerEnabled Then
                 ' Avvia il server se non è già in esecuzione
                 If m_netTransfer Is Nothing Then
-                    m_netTransfer = New Class_NetTransferTCP()
+                    m_netTransfer = New NetTransfer_Tcp()
                 End If
 
                 If Not m_netTransfer.IsServerRunning Then
