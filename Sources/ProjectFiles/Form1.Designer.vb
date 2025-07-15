@@ -78,13 +78,13 @@ Partial Class Form1
         txt_BandsMinFreq = New MyTextBox()
         Label12 = New Label()
         Label13 = New Label()
-        btnToggleUdpServer = New Button()
+        btnToggle = New Button()
         lblSyncStatus = New Label()
         chkEnableServer = New CheckBox()
         btn_AudioInputs = New MyButton()
         GroupBox4 = New GroupBox()
         cmb_AudioInDevices = New MyComboBox()
-        lblServerStatus = New Label()
+        lblConnectionStatus = New Label()
         btnSyncNTP = New Button()
         lstClients = New ListBox()
         btnGetTemplate = New Button()
@@ -93,6 +93,19 @@ Partial Class Form1
         btnEngageSystem = New MyButton()
         btnGetStroke = New Button()
         txtCorrelation = New MyTextBox()
+        txtDelay = New MyTextBox()
+        txtCorrelationForDelay = New MyTextBox()
+        Label2 = New Label()
+        Label9 = New Label()
+        lblCorrelation = New Label()
+        Label11 = New Label()
+        Label15 = New Label()
+        btnSaveWave = New Button()
+        chkTimeSync = New CheckBox()
+        btnConnect = New Button()
+        Label16 = New Label()
+        txtIpServer = New MyTextBox()
+        Label17 = New Label()
         CType(tk_TriggerLevel, ComponentModel.ISupportInitialize).BeginInit()
         GroupBox2.SuspendLayout()
         CType(tk_DeadTime, ComponentModel.ISupportInitialize).BeginInit()
@@ -785,30 +798,30 @@ Partial Class Form1
         Label13.Text = "Min dB"
         Label13.TextAlign = ContentAlignment.MiddleRight
         ' 
-        ' btnToggleUdpServer
+        ' btnToggle
         ' 
-        btnToggleUdpServer.Location = New Point(367, 613)
-        btnToggleUdpServer.Margin = New Padding(4, 5, 4, 5)
-        btnToggleUdpServer.Name = "btnToggleUdpServer"
-        btnToggleUdpServer.Size = New Size(107, 38)
-        btnToggleUdpServer.TabIndex = 238
-        btnToggleUdpServer.Text = "Server UDP"
-        btnToggleUdpServer.UseVisualStyleBackColor = True
+        btnToggle.Location = New Point(553, 458)
+        btnToggle.Margin = New Padding(4, 5, 4, 5)
+        btnToggle.Name = "btnToggle"
+        btnToggle.Size = New Size(107, 39)
+        btnToggle.TabIndex = 238
+        btnToggle.Text = "Toggle"
+        btnToggle.UseVisualStyleBackColor = True
         ' 
         ' lblSyncStatus
         ' 
         lblSyncStatus.AutoSize = True
-        lblSyncStatus.Location = New Point(367, 517)
+        lblSyncStatus.Location = New Point(396, 502)
         lblSyncStatus.Margin = New Padding(4, 0, 4, 0)
         lblSyncStatus.Name = "lblSyncStatus"
-        lblSyncStatus.Size = New Size(115, 25)
+        lblSyncStatus.Size = New Size(102, 25)
         lblSyncStatus.TabIndex = 237
-        lblSyncStatus.Text = "lblSyncStatus"
+        lblSyncStatus.Text = "Not synced"
         ' 
         ' chkEnableServer
         ' 
         chkEnableServer.AutoSize = True
-        chkEnableServer.Location = New Point(367, 460)
+        chkEnableServer.Location = New Point(563, 378)
         chkEnableServer.Margin = New Padding(4, 5, 4, 5)
         chkEnableServer.Name = "chkEnableServer"
         chkEnableServer.Size = New Size(87, 29)
@@ -917,34 +930,34 @@ Partial Class Form1
         cmb_AudioInDevices.TabIndex = 234
         cmb_AudioInDevices.TextPosition = 1
         ' 
-        ' lblServerStatus
+        ' lblConnectionStatus
         ' 
-        lblServerStatus.AutoSize = True
-        lblServerStatus.Location = New Point(367, 563)
-        lblServerStatus.Margin = New Padding(4, 0, 4, 0)
-        lblServerStatus.Name = "lblServerStatus"
-        lblServerStatus.Size = New Size(128, 25)
-        lblServerStatus.TabIndex = 239
-        lblServerStatus.Text = "lblServerStatus"
+        lblConnectionStatus.AutoSize = True
+        lblConnectionStatus.Location = New Point(573, 517)
+        lblConnectionStatus.Margin = New Padding(4, 0, 4, 0)
+        lblConnectionStatus.Name = "lblConnectionStatus"
+        lblConnectionStatus.Size = New Size(66, 25)
+        lblConnectionStatus.TabIndex = 239
+        lblConnectionStatus.Text = "Closed"
         ' 
         ' btnSyncNTP
         ' 
-        btnSyncNTP.Location = New Point(367, 393)
+        btnSyncNTP.Location = New Point(394, 421)
         btnSyncNTP.Margin = New Padding(4, 5, 4, 5)
         btnSyncNTP.Name = "btnSyncNTP"
-        btnSyncNTP.Size = New Size(107, 38)
+        btnSyncNTP.Size = New Size(107, 76)
         btnSyncNTP.TabIndex = 240
-        btnSyncNTP.Text = "Sync"
+        btnSyncNTP.Text = "Sync Clocks"
         btnSyncNTP.UseVisualStyleBackColor = True
         ' 
         ' lstClients
         ' 
         lstClients.FormattingEnabled = True
         lstClients.ItemHeight = 25
-        lstClients.Location = New Point(577, 385)
+        lstClients.Location = New Point(772, 378)
         lstClients.Margin = New Padding(4, 5, 4, 5)
         lstClients.Name = "lstClients"
-        lstClients.Size = New Size(170, 154)
+        lstClients.Size = New Size(415, 154)
         lstClients.TabIndex = 241
         ' 
         ' btnGetTemplate
@@ -954,7 +967,7 @@ Partial Class Form1
         btnGetTemplate.Name = "btnGetTemplate"
         btnGetTemplate.Size = New Size(107, 67)
         btnGetTemplate.TabIndex = 242
-        btnGetTemplate.Text = "Get template"
+        btnGetTemplate.Text = "Get Template"
         btnGetTemplate.UseVisualStyleBackColor = True
         ' 
         ' btnSaveTemplate
@@ -1050,7 +1063,7 @@ Partial Class Form1
         txtCorrelation.ArrowsIncrement = 0R
         txtCorrelation.BackColor_Over = SystemColors.Window
         txtCorrelation.Increment = 0R
-        txtCorrelation.Location = New Point(58, 572)
+        txtCorrelation.Location = New Point(58, 613)
         txtCorrelation.MaxValue = 100R
         txtCorrelation.MinValue = 0R
         txtCorrelation.Name = "txtCorrelation"
@@ -1063,12 +1076,176 @@ Partial Class Form1
         txtCorrelation.TabIndex = 247
         txtCorrelation.Text = "0"
         ' 
+        ' txtDelay
+        ' 
+        txtDelay.ArrowsIncrement = 0R
+        txtDelay.BackColor_Over = SystemColors.Window
+        txtDelay.Increment = 0R
+        txtDelay.Location = New Point(462, 576)
+        txtDelay.MaxValue = 100R
+        txtDelay.MinValue = 0R
+        txtDelay.Name = "txtDelay"
+        txtDelay.NumericValue = 0R
+        txtDelay.RectangleColor = Color.Transparent
+        txtDelay.RectangleStyle = ButtonBorderStyle.None
+        txtDelay.RoundingStep = 0R
+        txtDelay.ShadowColor = Color.Transparent
+        txtDelay.Size = New Size(150, 31)
+        txtDelay.TabIndex = 248
+        txtDelay.Text = "0"
+        ' 
+        ' txtCorrelationForDelay
+        ' 
+        txtCorrelationForDelay.ArrowsIncrement = 0R
+        txtCorrelationForDelay.BackColor_Over = SystemColors.Window
+        txtCorrelationForDelay.Increment = 0R
+        txtCorrelationForDelay.Location = New Point(462, 613)
+        txtCorrelationForDelay.MaxValue = 100R
+        txtCorrelationForDelay.MinValue = 0R
+        txtCorrelationForDelay.Name = "txtCorrelationForDelay"
+        txtCorrelationForDelay.NumericValue = 0R
+        txtCorrelationForDelay.RectangleColor = Color.Transparent
+        txtCorrelationForDelay.RectangleStyle = ButtonBorderStyle.None
+        txtCorrelationForDelay.RoundingStep = 0R
+        txtCorrelationForDelay.ShadowColor = Color.Transparent
+        txtCorrelationForDelay.Size = New Size(150, 31)
+        txtCorrelationForDelay.TabIndex = 249
+        txtCorrelationForDelay.Text = "0"
+        ' 
+        ' Label2
+        ' 
+        Label2.AutoSize = True
+        Label2.Location = New Point(364, 579)
+        Label2.Name = "Label2"
+        Label2.Size = New Size(56, 25)
+        Label2.TabIndex = 250
+        Label2.Text = "Delay"
+        ' 
+        ' Label9
+        ' 
+        Label9.AutoSize = True
+        Label9.Location = New Point(685, 324)
+        Label9.Name = "Label9"
+        Label9.Size = New Size(56, 25)
+        Label9.TabIndex = 251
+        Label9.Text = "Delay"
+        ' 
+        ' lblCorrelation
+        ' 
+        lblCorrelation.AutoSize = True
+        lblCorrelation.Location = New Point(364, 616)
+        lblCorrelation.Name = "lblCorrelation"
+        lblCorrelation.Size = New Size(99, 25)
+        lblCorrelation.TabIndex = 252
+        lblCorrelation.Text = "Correlation"
+        ' 
+        ' Label11
+        ' 
+        Label11.AutoSize = True
+        Label11.Location = New Point(664, 324)
+        Label11.Name = "Label11"
+        Label11.Size = New Size(99, 25)
+        Label11.TabIndex = 253
+        Label11.Text = "Correlation"
+        ' 
+        ' Label15
+        ' 
+        Label15.AutoSize = True
+        Label15.Location = New Point(75, 585)
+        Label15.Name = "Label15"
+        Label15.Size = New Size(99, 25)
+        Label15.TabIndex = 254
+        Label15.Text = "Correlation"
+        ' 
+        ' btnSaveWave
+        ' 
+        btnSaveWave.Location = New Point(619, 577)
+        btnSaveWave.Margin = New Padding(4, 5, 4, 5)
+        btnSaveWave.Name = "btnSaveWave"
+        btnSaveWave.Size = New Size(107, 67)
+        btnSaveWave.TabIndex = 255
+        btnSaveWave.Text = "Save Wave"
+        btnSaveWave.UseVisualStyleBackColor = True
+        ' 
+        ' chkTimeSync
+        ' 
+        chkTimeSync.AutoSize = True
+        chkTimeSync.Location = New Point(372, 378)
+        chkTimeSync.Margin = New Padding(4, 5, 4, 5)
+        chkTimeSync.Name = "chkTimeSync"
+        chkTimeSync.Size = New Size(150, 29)
+        chkTimeSync.TabIndex = 256
+        chkTimeSync.Text = "Clocks Synced"
+        chkTimeSync.UseVisualStyleBackColor = True
+        ' 
+        ' btnConnect
+        ' 
+        btnConnect.Location = New Point(553, 417)
+        btnConnect.Margin = New Padding(4, 5, 4, 5)
+        btnConnect.Name = "btnConnect"
+        btnConnect.Size = New Size(107, 39)
+        btnConnect.TabIndex = 257
+        btnConnect.Text = "Open"
+        btnConnect.UseVisualStyleBackColor = True
+        ' 
+        ' Label16
+        ' 
+        Label16.AutoSize = True
+        Label16.Location = New Point(807, 534)
+        Label16.Name = "Label16"
+        Label16.Size = New Size(101, 25)
+        Label16.TabIndex = 259
+        Label16.Text = "Server's IPs"
+        ' 
+        ' txtIpServer
+        ' 
+        txtIpServer.ArrowsIncrement = 0R
+        txtIpServer.BackColor_Over = SystemColors.Window
+        txtIpServer.Increment = 0R
+        txtIpServer.Location = New Point(774, 562)
+        txtIpServer.MaxValue = 100R
+        txtIpServer.MinValue = 0R
+        txtIpServer.Multiline = True
+        txtIpServer.Name = "txtIpServer"
+        txtIpServer.NumericValue = 100R
+        txtIpServer.NumericValueInteger = 100
+        txtIpServer.RectangleColor = Color.Transparent
+        txtIpServer.RectangleStyle = ButtonBorderStyle.None
+        txtIpServer.RoundingStep = 0R
+        txtIpServer.ShadowColor = Color.Transparent
+        txtIpServer.Size = New Size(166, 79)
+        txtIpServer.TabIndex = 258
+        txtIpServer.Text = "127.0.0.1"
+        txtIpServer.TextAlign = HorizontalAlignment.Center
+        ' 
+        ' Label17
+        ' 
+        Label17.AutoSize = True
+        Label17.Location = New Point(782, 348)
+        Label17.Name = "Label17"
+        Label17.Size = New Size(151, 25)
+        Label17.TabIndex = 260
+        Label17.Text = "Clients connected"
+        ' 
         ' Form1
         ' 
         AutoScaleDimensions = New SizeF(10F, 25F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = Color.AliceBlue
         ClientSize = New Size(1426, 672)
+        Controls.Add(Label17)
+        Controls.Add(Label16)
+        Controls.Add(txtIpServer)
+        Controls.Add(btnConnect)
+        Controls.Add(chkTimeSync)
+        Controls.Add(btnSaveWave)
+        Controls.Add(Label15)
+        Controls.Add(Label11)
+        Controls.Add(lblCorrelation)
+        Controls.Add(Label9)
+        Controls.Add(Label2)
+        Controls.Add(txtCorrelationForDelay)
+        Controls.Add(txtDelay)
         Controls.Add(txtCorrelation)
         Controls.Add(btnGetStroke)
         Controls.Add(btnEngageSystem)
@@ -1077,10 +1254,10 @@ Partial Class Form1
         Controls.Add(btnGetTemplate)
         Controls.Add(lstClients)
         Controls.Add(btnSyncNTP)
-        Controls.Add(lblServerStatus)
+        Controls.Add(lblConnectionStatus)
         Controls.Add(GroupBox4)
         Controls.Add(GroupBox_Bands)
-        Controls.Add(btnToggleUdpServer)
+        Controls.Add(btnToggle)
         Controls.Add(GroupBox3)
         Controls.Add(lblSyncStatus)
         Controls.Add(GroupBox1)
@@ -1147,8 +1324,8 @@ Partial Class Form1
     Friend WithEvents GroupBox4 As System.Windows.Forms.GroupBox
     Friend WithEvents chkEnableServer As CheckBox
     Friend WithEvents lblSyncStatus As Label
-    Friend WithEvents btnToggleUdpServer As Button
-    Friend WithEvents lblServerStatus As Label
+    Friend WithEvents btnToggle As Button
+    Friend WithEvents lblConnectionStatus As Label
     Friend WithEvents btnSyncNTP As Button
     Friend WithEvents lstClients As ListBox
     Friend WithEvents cmb_AudioInDevices As MyComboBox
@@ -1158,4 +1335,17 @@ Partial Class Form1
     Friend WithEvents btnEngageSystem As MyButton
     Friend WithEvents btnGetStroke As Button
     Friend WithEvents txtCorrelation As MyTextBox
+    Friend WithEvents txtDelay As MyTextBox
+    Friend WithEvents txtCorrelationForDelay As MyTextBox
+    Friend WithEvents Label2 As Label
+    Friend WithEvents Label9 As Label
+    Friend WithEvents lblCorrelation As Label
+    Friend WithEvents Label11 As Label
+    Friend WithEvents Label15 As Label
+    Friend WithEvents btnSaveWave As Button
+    Friend WithEvents chkTimeSync As CheckBox
+    Friend WithEvents btnConnect As Button
+    Friend WithEvents Label16 As Label
+    Friend WithEvents txtIpServer As MyTextBox
+    Friend WithEvents Label17 As Label
 End Class

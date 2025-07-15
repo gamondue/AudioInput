@@ -1,10 +1,11 @@
-﻿Imports System.Net
+﻿Imports System.Collections.Generic
+Imports System.Drawing.Drawing2D
+Imports System.Net
 Imports System.Net.Sockets
 Imports System.Threading
-Imports System.Collections.Generic
 
-Namespace SpectrumBands
-    Public Class Class_NetTransfer_Udp
+Namespace NetTransfer
+    Public Class NetTransfer_Udp
         ' Costanti per i tipi di messaggi
         Private Const MSG_TYPE_AUDIO_DATA As Byte = 0
         Private Const MSG_TYPE_NTP_REQUEST As Byte = 1
@@ -37,14 +38,25 @@ Namespace SpectrumBands
         Private m_timeOffset As Long = 0
         Private m_lastSyncTime As DateTime = DateTime.MinValue
 
-        ' Eventi
+        Private m_syncHandlerAttachedUdp As Boolean = False
+
+        ' Eventi 
         Public Event SyncCompleted(offsetMs As Long, roundTripMs As Long)
+        'Public Event SyncCompleted As SyncCompletedEventHandler
+
+        ' Eventi per notificare l'UI
+        'Public Delegate Sub SyncCompletedEventHandler(offsetMs As Long, roundTripMs As Long)
+
         Public Event ClientConnected(clientId As String, endPoint As IPEndPoint)
         Public Event ClientDisconnected(clientId As String)
         Public Event ServerStatusChanged(isRunning As Boolean)
+        Public Delegate Sub UdpClientEventHandler(clientId As String, endPointInfo As String)
+        Public Delegate Sub UdpServerStatusEventHandler(isRunning As Boolean)
+        Public Event UdpClientDisconnected As UdpClientEventHandler
+        Public Event UdpServerStatusChanged As UdpServerStatusEventHandler
 
         ' Classe per memorizzare informazioni sui client
-        Private Class ClientInfo
+        Public Class ClientInfo
             Public Id As String
             Public EndPoint As IPEndPoint
             Public LastSeen As DateTime
@@ -54,32 +66,49 @@ Namespace SpectrumBands
                 Me.EndPoint = endPoint
                 Me.LastSeen = DateTime.UtcNow
             End Sub
+            ' override the ToString function
+            Public Overrides Function ToString() As String
+                Return EndPoint.Address.ToString()
+            End Function
         End Class
 
 #Region "Initialization and Cleanup"
         ' Costruttore per modalità client
         Public Sub New(serverAddress As String, serverPort As Integer)
             m_serverEndPoint = New IPEndPoint(IPAddress.Parse(serverAddress), serverPort)
-            InitializeUdpClient()
+            StartClient()
         End Sub
 
         ' Costruttore per modalità server
         Public Sub New(serverPort As Integer)
             m_localPort = serverPort
             m_isServerMode = True
-            InitializeUdpClient()
+            StartServer()
         End Sub
-
-        Private Sub InitializeUdpClient()
+        Friend Sub StartClient()
             Try
+                ' In modalità client, usa una porta casuale
+                m_udpClient = New UdpClient(0)
+                ' Avvia thread di ricezione
+                m_isRunning = True
+                m_receiveThread = New Thread(AddressOf ReceiveLoop)
+                m_receiveThread.IsBackground = True
+                m_receiveThread.Start()
+            Catch ex As Exception
                 If m_isServerMode Then
-                    ' In modalità server, associa alla porta specificata
-                    m_udpClient = New UdpClient(m_localPort)
-                Else
-                    ' In modalità client, usa una porta casuale
-                    m_udpClient = New UdpClient(0)
+                    RaiseEvent ServerStatusChanged(False)
                 End If
-
+            End Try
+            m_isRunning = True
+            Connect()
+        End Sub
+        Friend Sub StopClient()
+            Close()
+        End Sub
+        Friend Sub StartServer()
+            Try
+                ' In modalità server, associa alla porta specificata
+                m_udpClient = New UdpClient(m_localPort)
                 ' Avvia thread di ricezione
                 m_isRunning = True
                 m_receiveThread = New Thread(AddressOf ReceiveLoop)
@@ -100,7 +129,9 @@ Namespace SpectrumBands
                 End If
             End Try
         End Sub
-
+        Friend Sub StopServer()
+            Close()
+        End Sub
         Public Sub Close()
             m_isRunning = False
             m_isConnected = False
@@ -133,21 +164,17 @@ Namespace SpectrumBands
             If Not m_isRunning OrElse m_isServerMode Then
                 Return False
             End If
-
             Try
                 ' Invia messaggio HELLO al server
                 Dim msgBuffer(16) As Byte
                 msgBuffer(0) = MSG_TYPE_CLIENT_HELLO
                 Buffer.BlockCopy(m_clientId.ToByteArray(), 0, msgBuffer, 1, 16)
-
                 m_udpClient.Send(msgBuffer, msgBuffer.Length, m_serverEndPoint)
-
                 ' Imposta un timer per verificare la connessione
                 Dim waitTimeout As DateTime = DateTime.UtcNow.AddSeconds(5)
                 While DateTime.UtcNow < waitTimeout AndAlso Not m_isConnected
                     Thread.Sleep(100)
                 End While
-
                 Return m_isConnected
             Catch ex As Exception
                 Return False
@@ -170,19 +197,14 @@ Namespace SpectrumBands
                 Dim dataLength As Integer = data.Length * 2
                 Dim packetSize As Integer = dataLength + 1 + 16  ' 1 byte tipo + 16 byte client ID
                 Dim packet(packetSize - 1) As Byte
-
                 ' Tipo messaggio
                 packet(0) = MSG_TYPE_AUDIO_DATA
-
                 ' ID client
                 Buffer.BlockCopy(m_clientId.ToByteArray(), 0, packet, 1, 16)
-
                 ' Dati audio
                 Buffer.BlockCopy(data, 0, packet, 17, dataLength)
-
                 ' Invia pacchetto
                 m_udpClient.Send(packet, packet.Length, m_serverEndPoint)
-
                 Return True
             Catch ex As Exception
                 m_isConnected = False
@@ -291,10 +313,10 @@ Namespace SpectrumBands
 #End Region
 
 #Region "NTP Sync Methods"
-        ' Richiedi sincronizzazione NTP (lato client)
-        Public Sub RequestTimeSync()
+        ' Richiesta di sincronizzazione NTP like (lato client)
+        Friend Function RequestTimeSync() As Boolean
             If Not m_isRunning OrElse Not m_isConnected Then
-                Return
+                Return False
             End If
 
             Try
@@ -314,8 +336,10 @@ Namespace SpectrumBands
                 m_udpClient.Send(msgBuffer, msgBuffer.Length, m_serverEndPoint)
             Catch ex As Exception
                 m_isConnected = False
+                Return False
             End Try
-        End Sub
+            Return True
+        End Function
 
         ' Invia risposta di sincronizzazione (lato server)
         Private Sub SendTimeSyncResponse(clientId As Guid, clientTime As Long, receiveTime As Long, endPoint As IPEndPoint)
@@ -394,15 +418,6 @@ Namespace SpectrumBands
                     End If
             End Select
         End Sub
-
-        ' Ottieni timestamp sincronizzato
-        Public Function GetSynchronizedTime() As DateTime
-            If m_lastSyncTime = DateTime.MinValue Then
-                Return DateTime.UtcNow
-            End If
-
-            Return DateTime.UtcNow.AddTicks(m_timeOffset)
-        End Function
 #End Region
 
 #Region "Message Processing"
@@ -503,6 +518,14 @@ Namespace SpectrumBands
 #End Region
 
 #Region "Properties"
+        Public Property IsServer() As Boolean
+            Get
+                Return m_isServerMode
+            End Get
+            Set(value As Boolean)
+                m_isServerMode = value
+            End Set
+        End Property
         Public ReadOnly Property IsConnected() As Boolean
             Get
                 ' Per client: connesso al server
@@ -518,7 +541,6 @@ Namespace SpectrumBands
                 End If
             End Get
         End Property
-
         Public Property SendEnabled() As Boolean
             Get
                 Return m_sendEnabled
@@ -527,14 +549,12 @@ Namespace SpectrumBands
                 m_sendEnabled = value
             End Set
         End Property
-
         Public ReadOnly Property IsServerRunning() As Boolean
             Get
                 Return m_isRunning AndAlso m_isServerMode
             End Get
         End Property
-
-        Public ReadOnly Property ConnectedClients() As Integer
+        Public ReadOnly Property NConnectedClients() As Integer
             Get
                 If Not m_isServerMode Then
                     Return 0
@@ -545,7 +565,16 @@ Namespace SpectrumBands
                 End SyncLock
             End Get
         End Property
-
+        Public ReadOnly Property ConnectedClients() As List(Of ClientInfo)
+            Get
+                If Not m_isServerMode Then
+                    Return New List(Of ClientInfo)
+                End If
+                SyncLock m_clientsLock
+                    Return m_clients.Values.ToList()
+                End SyncLock
+            End Get
+        End Property
         Public Property BroadcastEnabled() As Boolean
             Get
                 Return m_broadcastEnabled
@@ -555,5 +584,126 @@ Namespace SpectrumBands
             End Set
         End Property
 #End Region
+
+#Region "UDP Methods"
+        'Friend Sub Initialize(Optional ByVal tcpServerAddress As String = "127.0.0.1",
+        '             Optional ByVal tcpServerPort As Integer = 8080)
+        '    CloseAll()
+        '    ' Inizializza la connessione UDP client
+        '    m_netTransferUdp = New NetTransfer_Udp(tcpServerAddress, tcpServerPort)
+        '    m_netTransferUdp.Connect()
+        'End Sub
+
+        '' Metodo per chiudere la connessione UDP
+        'Friend Sub CloseAll()
+        '    If m_netTransferUdp IsNot Nothing Then
+        '        m_netTransferUdp.Close()
+        '        m_netTransferUdp = Nothing
+        '    End If
+        'End Sub
+
+        ' Metodo per avviare un server UDP
+        'Friend Function StartServer(port As Integer) As Boolean
+        '    If m_netTransferUdp IsNot Nothing Then
+        '        m_netTransferUdp.Close()
+        '    End If
+
+        '    Try
+        '        m_netTransferUdp = New NetTransfer_Udp(port)
+        '        AddHandler m_netTransferUdp.ClientConnected, AddressOf OnClientConnected
+        '        AddHandler m_netTransferUdp.ClientDisconnected, AddressOf OnClientDisconnected
+        '        AddHandler m_netTransferUdp.ServerStatusChanged, AddressOf OnServerStatusChanged
+        '        Return True
+        '    Catch ex As Exception
+        '        Return False
+        '    End Try
+        'End Function
+
+        '' Metodo per fermare il server UDP
+        'Friend Sub StopUdpServer()
+        '    If m_netTransferUdp IsNot Nothing Then
+        '        m_netTransferUdp.Close()
+        '        m_netTransferUdp = Nothing
+        '    End If
+        'End Sub
+        ' Handler eventi server
+        Private Sub OnClientConnected(clientId As String, endPoint As IPEndPoint)
+            ' Qui puoi notificare l'UI della connessione di un nuovo client
+            RaiseEvent ClientConnected(clientId, endPoint)
+        End Sub
+        Private Sub OnClientDisconnected(clientId As String)
+            ' Qui puoi notificare l'UI della disconnessione di un client
+            RaiseEvent ClientDisconnected(clientId)
+        End Sub
+        Private Sub OnServerStatusChanged(isRunning As Boolean)
+            ' Qui puoi notificare l'UI del cambio di stato del server
+            RaiseEvent UdpServerStatusChanged(isRunning)
+        End Sub
+
+#End Region
+
+#Region "Time sync Methods"
+        ' Variabile per tenere traccia degli handler di eventi
+        Private m_syncHandlerAttached As Boolean = False
+
+        ' Callback quando la sincronizzazione è completata
+        Private Sub OnSyncCompleted(offsetMs As Long, roundTripMs As Long)
+            ' Notifica UI della sincronizzazione completata
+            RaiseEvent SyncCompleted(offsetMs, roundTripMs)
+        End Sub
+        ' Ottieni timestamp sincronizzato
+        Public Function GetSynchronizedTime() As DateTime
+            If m_lastSyncTime = DateTime.MinValue Then
+                Return DateTime.UtcNow
+            End If
+            Return DateTime.UtcNow.AddTicks(m_timeOffset)
+        End Function
+        Friend Sub ToggleServer(checked As Boolean)
+            Throw New NotImplementedException()
+        End Sub
+        ' !!!! UTILIZZAZIONE !!!!
+        ' Ottieni il tempo sincronizzato
+        'Friend Function GetSynchronizedTime() As DateTime
+        '    If m_netTransfer IsNot Nothing Then
+        '        Return m_netTransfer.GetSynchronizedTime()
+        '    Else
+        '        Return DateTime.UtcNow
+        '    End If
+        'End Function
+        ' Richiedi sincronizzazione NTP
+        'Friend Function RequestNTPSync() As Boolean
+        '    If m_netTransfer Is Nothing OrElse Not m_netTransfer.IsConnected Then
+        '        Return False
+        '    End If
+
+        '    ' Aggiunge handler per l'evento di completamento, se non già fatto
+        '    If Not m_syncHandlerAttached Then
+        '        AddHandler m_netTransfer.SyncCompleted, AddressOf OnSyncCompleted
+        '        m_syncHandlerAttached = True
+        '    End If
+
+        '    ' Invia richiesta di sincronizzazione
+        '    m_netTransfer.RequestTimeSync()
+        '    Return True
+        'End Function
+
+        ' Richiedi sincronizzazione NTP via UDP
+        Friend Function RequestNTPSync() As Boolean
+            If Not IsConnected Then
+                Return False
+            End If
+
+            ' Aggiunge handler per l'evento di completamento, se non già fatto
+            If Not m_syncHandlerAttachedUdp Then
+                AddHandler SyncCompleted, AddressOf OnSyncCompleted
+                m_syncHandlerAttachedUdp = True
+            End If
+
+            ' Invia richiesta di sincronizzazione
+            RequestTimeSync()
+            Return True
+        End Function
+#End Region
+
     End Class
 End Namespace

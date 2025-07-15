@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36221.1 d17.14
+VisualStudioVersion = 17.14.36221.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Theremino_AudioInput", "Theremino_AudioInput.vbproj", "{BB2B88DF-8C6A-5DF6-C3B4-8086793DC601}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "LocateStrokes", "..\..\LocateStrokes\ConsoleApp1\LocateStrokes.vbproj", "{4B0F50CA-0298-4215-8A6D-8DFE03E8367C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{BB2B88DF-8C6A-5DF6-C3B4-8086793DC601}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB2B88DF-8C6A-5DF6-C3B4-8086793DC601}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB2B88DF-8C6A-5DF6-C3B4-8086793DC601}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B0F50CA-0298-4215-8A6D-8DFE03E8367C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B0F50CA-0298-4215-8A6D-8DFE03E8367C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B0F50CA-0298-4215-8A6D-8DFE03E8367C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B0F50CA-0298-4215-8A6D-8DFE03E8367C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

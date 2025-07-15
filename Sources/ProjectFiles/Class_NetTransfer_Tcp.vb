@@ -2,7 +2,7 @@
 Imports System.Net.Sockets
 Imports System.Threading
 
-Namespace SpectrumBands
+Namespace NetTransfer
     Public Class NetTransfer_Tcp
 
         ' Proprietà e variabili per la modalità client
@@ -430,6 +430,39 @@ Namespace SpectrumBands
             End Try
         End Sub
 #End Region
+
+
+
+        '    ' Inizializza la connessione TCP
+        '    m_netTransfer = New NetTransfer_Tcp(tcpServerAddress, tcpServerPort)
+        '    m_netTransfer.Connect()
+
+
+        '    If m_netTransfer IsNot Nothing Then
+        '        m_netTransfer.Disconnect()
+        '        m_netTransfer = Nothing
+        '    End If
+
+
+
+        'Friend Sub ToggleServer(isServerEnabled As Boolean, Optional serverPort As Integer = 8080)
+        '    If isServerEnabled Then
+        '        ' Avvia il server se non è già in esecuzione
+        '        If m_netTransfer Is Nothing Then
+        '            m_netTransfer = New NetTransfer_Tcp()
+        '        End If
+
+        '        If Not m_netTransfer.IsServerRunning Then
+        '            m_netTransfer.StartServer(serverPort)
+        '        End If
+        '    Else
+        '        ' Ferma il server se è in esecuzione
+        '        If m_netTransfer IsNot Nothing AndAlso m_netTransfer.IsServerRunning Then
+        '            m_netTransfer.StopServer()
+        '        End If
+        '    End If
+        'End Sub
+
     End Class
 End Namespace
 

@@ -2,7 +2,6 @@
 Imports System.Math
 
 Module Module_SaveLoad
-
     Friend EventsAreEnabled As Boolean = False
 
 
@@ -66,8 +65,8 @@ Module Module_SaveLoad
     ' ================================================================================================
     '  Private Read-Write functions
     ' ================================================================================================
-    Private Function TabString(ByVal Name As String, _
-                               Optional ByVal Value As Double = Double.NaN, _
+    Private Function TabString(ByVal Name As String,
+                               Optional ByVal Value As Double = Double.NaN,
                                Optional ByVal fmt As String = "") As String
 
         Dim nTab As Int32 = Math.Max(0, 22 - Name.Length)
@@ -77,14 +76,14 @@ Module Module_SaveLoad
             Return Name & "=" & Strings.StrDup(nTab, " ") & Value.ToString(fmt, GCI)
         End If
     End Function
-    Private Function TabString(ByVal Name As String, _
+    Private Function TabString(ByVal Name As String,
                                   ByVal Value As Boolean) As String
 
         Dim nTab As Int32 = Math.Max(0, 22 - Name.Length)
 
         Return Name & "=" & Strings.StrDup(nTab, " ") & Value.ToString
     End Function
-    Private Function TabString(ByVal Name As String, _
+    Private Function TabString(ByVal Name As String,
                                 ByVal Value As String) As String
 
         Dim nTab As Int32 = Math.Max(0, 22 - Name.Length)

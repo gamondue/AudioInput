@@ -1,7 +1,7 @@
  Program Params
 ===========================================
-Form1_Top=             592
-Form1_Left=            292
+Form1_Top=             283
+Form1_Left=            192
 Form1_WindowState=     0
 
  Input selector

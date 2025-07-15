@@ -1,14 +1,28 @@
-﻿Public Class LocateStrokes
+﻿Imports System
+Imports System.Collections.Generic
+Imports System.Numerics
+Imports MathNet.Numerics.LinearAlgebra
+Imports Theremino_AudioInput.NetTransfer
+Imports Theremino_AudioInput.SpectrumBands
+
+Public Class LocateStrokes
 
     Friend Shared Property NormalizedTemplateWave As Double()
     Friend Shared Property TemplateWave As Int16()
+    Friend Shared Property CurrentWave As Int16()
     Friend Shared CorrelationWithTemplate As Double
+    Friend Shared DelayInSamples As Double
+    Friend Shared CorrelationWithOtherWave As Double
 
+    Private m_netTransfer As NetTransfer_Tcp
+    Private m_netTransferUdp As NetTransfer_Udp
 
     Friend Shared Function WaitForSound(wave As WaveReader) As Int16()
         While (Not wave.isOverThreshold)
         End While
-        Return wave.outBuffer
+        Dim waveData As Int16() = New Int16(wave.outBuffer.Length - 1) {}
+        Array.Copy(wave.outBuffer, waveData, wave.outBuffer.Length)
+        Return waveData
     End Function
 
     Friend Shared Function GetTemplateWave(wave As WaveReader) As Double()
@@ -24,20 +38,20 @@
                                           runningOnServer As Boolean)
         While (Not exitLocateStrokes)
             ' get the next sound big enough
-            Dim waveData As Int16() = WaitForSound(waveReader)
-        ' check if this sound il similar enough to the template sound
-        CorrelationWithTemplate = MaxCrossCorrelationNormalized(
-            waveData, NormalizedTemplateWave)
-        exitLocateStrokes = False
+            CurrentWave = WaitForSound(waveReader)
+            ' check if this sound il similar enough to the template sound
+            CorrelationWithTemplate = MaxCrossCorrelationNormalized(
+                CurrentWave, NormalizedTemplateWave)
+            exitLocateStrokes = False
             If (CorrelationWithTemplate < 0.3) Then
-                ' strokes detected
+                ' stroke detected
                 ' if it isn't connected, do nothing
                 ' !!!! TODO !!!!
                 If (True) Then
                     ' if it is a server, compare the waveReader data with other
                     ' received from clients
                     If runningOnServer Then
-                        If waveData IsNot Nothing AndAlso waveData.Length > 0 Then
+                        If CurrentWave IsNot Nothing AndAlso CurrentWave.Length > 0 Then
 
                         End If
                     Else
@@ -46,18 +60,18 @@
                 End If
             End If
             If Not exitLocateStrokes Then
-                Return waveData
+                Return CurrentWave
             Else
                 Return Nothing
             End If
         End While
     End Function
     ' Calculate the delay (in samples) between two audio signals using cross-correlation
-    Function CalculateDelayWithCrossCorrelation(a() As Double, b() As Double) As Integer
+    Friend Shared Function CalculateDelayWithCrossCorrelation(a() As Double,
+                                                b() As Double) As Integer
         Dim n As Integer = a.Length
         Dim maxCorr As Double = Double.MinValue
         Dim bestShift As Integer = 0
-
         For shift As Integer = -n + 1 To n - 1
             Dim sum As Double = 0
             For i As Integer = 0 To n - 1
@@ -71,6 +85,8 @@
                 bestShift = shift
             End If
         Next
+        DelayInSamples = bestShift
+        CorrelationWithOtherWave = maxCorr / n
 
         Return bestShift ' positivo: normalizedTemplate è in ritardo di bestShift campioni rispetto ad waveReader
     End Function
@@ -168,4 +184,87 @@
         Dim maxCorr As Double = MaxCrossCorrelationNormalized(wave, template)
         Return maxCorr > threshold
     End Function
+    Public Class GaussNewtonLocalization
+
+        Public Structure Microphone
+            Public X As Double
+            Public Y As Double
+            Public Time As Double
+
+            Public Sub New(x As Double, y As Double, time As Double)
+                Me.X = x
+                Me.Y = y
+                Me.Time = time
+            End Sub
+        End Structure
+
+        Public Shared Function EstimateSource(mics As List(Of Microphone),
+                            soundSpeed As Double,
+                            Optional maxIterations As Integer = 100,
+                            Optional tolerance As Double = 0.000001) As (x As Double, y As Double)
+            If mics.Count < 4 Then
+                Throw New ArgumentException("Servono almeno 4 microfoni per una stima robusta.")
+            End If
+
+            ' Stima iniziale: centroide dei microfoni
+            Dim x As Double = 0, y As Double = 0
+            For Each mic In mics
+                x += mic.X
+                y += mic.Y
+            Next
+            x /= mics.Count
+            y /= mics.Count
+
+            For iter As Integer = 0 To maxIterations - 1
+                Dim J = Matrix(Of Double).Build.Dense(mics.Count, 2) ' Jacobiano
+                Dim r = MathNet.Numerics.LinearAlgebra.Vector(Of Double).Build.Dense(mics.Count)     ' Residui
+
+                For i As Integer = 0 To mics.Count - 1
+                    Dim mic = mics(i)
+                    Dim dx = x - mic.X
+                    Dim dy = y - mic.Y
+                    Dim dist = Math.Sqrt(dx * dx + dy * dy)
+                    Dim predictedTime = dist / soundSpeed
+                    Dim residual = mic.Time - predictedTime
+
+                    r(i) = residual
+
+                    If dist > 0.000001 Then
+                        J(i, 0) = -dx / (soundSpeed * dist)
+                        J(i, 1) = -dy / (soundSpeed * dist)
+                    End If
+                Next
+
+                Dim JT = J.Transpose()
+                Dim H = JT * J ' Hessiana approssimata
+                Dim g = JT * r ' Gradiente
+
+                Dim delta = H.Solve(g)
+
+                x += delta(0)
+                y += delta(1)
+
+                If delta.L2Norm() < tolerance Then
+                    Exit For
+                End If
+            Next
+
+            Return (x, y)
+        End Function
+
+        'Public Shared Sub Main()
+        '    Dim v As Double = 3000 ' velocità del suono nel muro (m/s)
+
+        '    Dim microfoni As New List(Of Microphone) From {
+        '        New Microphone(0, 0, 0.00000),
+        '        New Microphone(1, 0, 0.00032),
+        '        New Microphone(0, 1, 0.00028),
+        '        New Microphone(1, 1, 0.00045)
+        '    }
+
+        '    Dim risultato = EstimateSource(microfoni, v)
+        '    Console.WriteLine($"Sorgente stimata in: ({risultato.x:F4}, {risultato.y:F4}) metri")
+        'End Sub
+
+    End Class
 End Class

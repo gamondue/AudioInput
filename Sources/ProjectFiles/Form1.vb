@@ -1,4 +1,7 @@
 ﻿Imports System.Drawing
+Imports System.Net
+Imports Theremino_AudioInput.NetTransfer
+Imports Theremino_AudioInput.NetTransfer.NetTransfer_Udp
 
 Public Class Form1
 
@@ -8,11 +11,14 @@ Public Class Form1
     Private Slot_Meter As Int32
     Private Slot_Spectrum As Int32
 
+    Private TemplateWave As Double()
 
     Private isMeasuringStrokes As Boolean = False
     Private locateStrokesThread As Threading.Thread = Nothing
     Private previousBackGround As Color
     Private previousForeColor As Color
+
+    Private WithEvents netTransfer As NetTransfer_Udp
 
     Private Sub Form1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         EventsAreEnabled = False
@@ -30,23 +36,14 @@ Public Class Form1
         Opacity = 1
 
         ReadTemplateWave()
-
-        ' Registra l'handler per l'evento di sincronizzazione completata
-        AddHandler SpectrumBands.SyncCompleted, AddressOf OnSyncCompleted
-
-        ' eventi UDP
-        AddHandler SpectrumBands.SyncCompleted, AddressOf OnSyncCompleted
-        AddHandler SpectrumBands.UdpClientConnected, AddressOf OnUdpClientConnected
-        AddHandler SpectrumBands.UdpClientDisconnected, AddressOf OnUdpClientDisconnected
-        AddHandler SpectrumBands.UdpServerStatusChanged, AddressOf OnUdpServerStatusChanged
     End Sub
-
     Private Sub Form_Closing(ByVal sender As Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles Me.FormClosing
         Save_INI()
         m_WaveReader.RecordStop()
-        SpectrumBands.CloseAll()
+        If Not netTransfer Is Nothing Then
+            netTransfer.Close()
+        End If
     End Sub
-
     Private Sub Form_LocationChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.LocationChanged
         If Not EventsAreEnabled Then Exit Sub
         LimitFormPosition(Me)
@@ -65,7 +62,6 @@ Public Class Form1
     '  SELECT AUDIO INPUT 
     ' ===================================================================================================
     Friend SelectedAudioIn As Int32 = 0
-    Private TemplateWave As Double()
 
     Private Sub cmb_AudioInDevices_DropDown(ByVal sender As Object, ByVal e As EventArgs)
         cmb_AudioInDevices.ItemHeight = 16
@@ -89,7 +85,6 @@ Public Class Form1
         Next
         Combo_SetIndex(cmb_AudioInDevices, SelectedAudioIn)
     End Sub
-
     ' ===================================================================================================
     '  AUDIO IN HELPERS
     ' ===================================================================================================
@@ -105,8 +100,6 @@ Public Class Form1
     Private Sub btn_AudioInputs_ClickButtonArea(ByVal Sender As Object, ByVal e As EventArgs)
         Open_AudioInputs()
     End Sub
-
-
     ' ================================================================================================
     '    TIMERS
     ' ================================================================================================
@@ -139,6 +132,10 @@ Public Class Form1
         End If
 
         txtCount.Text = m_WaveReader.Counter.ToString("0")
+
+        txtCorrelationForDelay.Text = LocateStrokes.CorrelationWithOtherWave.ToString("0.0000")
+        txtDelay.Text = LocateStrokes.DelayInSamples.ToString("0")
+
         'Dim c As Double
         'Me.Invoke(Sub()
         '              ' codice per mostrare risultati nell'UI
@@ -151,8 +148,6 @@ Public Class Form1
                       txtCorrelation.Text = LocateStrokes.CorrelationWithTemplate
                   End Sub)
     End Sub
-
-
     ' ================================================================================================
     '   SAVE INI ON LOST-FOCUS
     ' ================================================================================================
@@ -160,8 +155,6 @@ Public Class Form1
                                      ByVal e As EventArgs) Handles tk_TriggerLevel.LostFocus
         Save_INI()
     End Sub
-
-
     ' ================================================================================================
     '   SET PROPERTIES
     ' ================================================================================================
@@ -195,14 +188,17 @@ Public Class Form1
         '''    Me.Width = 330
         '''End If
     End Sub
-
     Private Sub chkEnableServer_CheckedChanged(sender As Object, e As EventArgs) Handles chkEnableServer.CheckedChanged
-        SpectrumBands.ToggleServer(chkEnableServer.Checked)
+        If netTransfer IsNot Nothing Then
+            netTransfer.StopClient()
+            netTransfer.StopServer()
+            netTransfer = Nothing
+        End If
+        lblConnectionStatus.Text = "Closed"
     End Sub
-
     Private Sub btnSyncNTP_ClickButtonArea(Sender As Object, e As EventArgs)
         ' Controlla se il client è connesso
-        If SpectrumBands.RequestNTPSync Then
+        If netTransfer.RequestNTPSync Then
             btnSyncNTP.Enabled = False
             lblSyncStatus.Text = "Sincronizzazione in corso..."
 
@@ -218,7 +214,6 @@ Public Class Form1
             lblSyncStatus.Text = "Impossibile sincronizzare: client non connesso"
         End If
     End Sub
-
     ' Gestore per l'evento di completamento
     Private Sub OnSyncCompleted(offsetMs As Long, roundTripMs As Long)
         ' Questo viene chiamato quando la sincronizzazione è completata
@@ -236,7 +231,6 @@ Public Class Form1
             lstClients.Items.Add($"{clientId} ({endPointInfo})")
         End If
     End Sub
-
     Private Sub OnUdpServerStatusChanged(isRunning As Boolean)
         If Me.InvokeRequired Then
             Me.Invoke(Sub() UpdateServerStatusUI(isRunning))
@@ -251,7 +245,6 @@ Public Class Form1
             RemoveClientFromList(clientId)
         End If
     End Sub
-
     Private Sub RemoveClientFromList(clientId As String)
         For i As Integer = lstClients.Items.Count - 1 To 0 Step -1
             If lstClients.Items(i).ToString().StartsWith(clientId) Then
@@ -260,38 +253,21 @@ Public Class Form1
             End If
         Next
     End Sub
-
     Private Sub UpdateServerStatusUI(isRunning As Boolean)
         If isRunning Then
-            lblServerStatus.Text = "Server UDP in ascolto"
-            btnToggleUdpServer.Text = "Arresta Server UDP"
+            lblConnectionStatus.Text = "Server UDP in ascolto"
+            btnToggle.Text = "Arresta Server UDP"
         Else
-            lblServerStatus.Text = "Server UDP arrestato"
-            btnToggleUdpServer.Text = "Avvia Server UDP"
+            lblConnectionStatus.Text = "Server UDP arrestato"
+            btnToggle.Text = "Avvia Server UDP"
             lstClients.Items.Clear()
         End If
     End Sub
     Private Sub UpdateSyncUI(offsetMs As Long, roundTripMs As Long)
         lblSyncStatus.Text = $"Sincronizzazione completata. Offset: {offsetMs} ms, RTT: {roundTripMs} ms"
     End Sub
-
-    Private Sub btnToggleUdpServer_Click(sender As Object, e As EventArgs) Handles btnToggleUdpServer.Click
-        If btnToggleUdpServer.Text = "Avvia Server UDP" Then
-            If SpectrumBands.StartUdpServer(27759) Then
-                btnToggleUdpServer.Text = "Arresta Server UDP"
-                lblServerStatus.Text = "Server UDP in ascolto..."
-            Else
-                MessageBox.Show("Impossibile avviare il server UDP", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            End If
-        Else
-            SpectrumBands.StopUdpServer()
-            btnToggleUdpServer.Text = "Avvia Server UDP"
-            lblServerStatus.Text = "Server UDP arrestato"
-        End If
-    End Sub
-
     Private Sub btnSyncNTP_Click(sender As Object, e As EventArgs) Handles btnSyncNTP.Click
-        If SpectrumBands.RequestNTPSyncUdp() Then
+        If netTransfer.RequestTimeSync() Then
             btnSyncNTP.Enabled = False
             lblSyncStatus.Text = "Sincronizzazione in corso..."
 
@@ -307,11 +283,9 @@ Public Class Form1
             lblSyncStatus.Text = "Impossibile sincronizzare: client non connesso"
         End If
     End Sub
-
     Private Sub btnGetTemplate_Click(sender As Object, e As EventArgs) Handles btnGetTemplate.Click
         TemplateWave = LocateStrokes.GetTemplateWave(m_WaveReader)
     End Sub
-
     Private Sub btnLocatestrokes_Click(sender As Object, e As EventArgs) Handles btnGetStroke.Click
         If Not isMeasuringStrokes Then
             isMeasuringStrokes = True
@@ -329,8 +303,13 @@ Public Class Form1
                         While isMeasuringStrokes
                             ' Esegui la rilevazione del colpo d'ariete
                             Dim result = LocateStrokes.GetStroke(m_WaveReader, chkEnableServer.Checked)
+                            ' calcolo del ritardo
+
+                            Dim waveNormalized As Double() = LocateStrokes.NormalizeWave(m_WaveReader.outBuffer)
                             ' Se rileva un colpo d'ariete (result non è Nothing)
                             If result IsNot Nothing Then
+                                Dim sampleOfDelay = LocateStrokes.CalculateDelayWithCrossCorrelation(waveNormalized, TemplateWave)
+
                                 ' Aggiorna l'interfaccia utente in modo thread-safe
                                 'Me.Invoke(Sub()
                                 '              ' codice per mostrare risultati nell'UI
@@ -413,6 +392,92 @@ Public Class Form1
             MessageBox.Show($"Template wave caricato da {filePath}", "Caricamento completato", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Else
             MessageBox.Show($"File {filePath} non trovato.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Sub
+    Private Sub btnSaveWave_Click(sender As Object, e As EventArgs) Handles btnSaveWave.Click
+        ' normalizza l'array CurrentWave prima di salvarlo
+        Dim CurrentWave As Double() = LocateStrokes.NormalizeWave(LocateStrokes.CurrentWave)
+        ' Salva l'array CurrentWave in un file csv
+        If CurrentWave IsNot Nothing AndAlso CurrentWave.Length > 0 Then
+            Dim filePath = "AcquiredWave.csv"
+            Using writer As New IO.StreamWriter(filePath)
+                For Each value In CurrentWave
+                    writer.WriteLine(value.ToString("F6"))
+                Next
+            End Using
+            MessageBox.Show($"Segnale salvato in {filePath}", "Salvataggio completato", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show("Nessun segnale disponibile da salvare.", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End If
+    End Sub
+    Private Sub btnToggle_Click(sender As Object, e As EventArgs) Handles btnToggle.Click
+        If chkEnableServer.Checked = False Then
+            'If Not netTransfer.IsServer Then
+            netTransfer = New NetTransfer_Udp(27759)
+            netTransfer.StopClient()
+            netTransfer.StartServer()
+            btnToggle.Text = "Arresta Server UDP"
+            lblConnectionStatus.Text = "Server UDP in ascolto..."
+            'Else
+            '    MessageBox.Show("Impossibile avviare il server UDP", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            'End If
+        Else
+            netTransfer = New NetTransfer_Udp("localhost", 27759)
+            netTransfer.StopServer()
+            netTransfer.StartClient()
+            btnToggle.Text = "Avvia Server UDP"
+            lblConnectionStatus.Text = "Server UDP arrestato"
+        End If
+    End Sub
+    Private Sub btnConnect_Click(sender As Object, e As EventArgs) Handles btnConnect.Click
+        If chkEnableServer.Checked Then
+            netTransfer = New NetTransfer_Udp(27759)
+            'btnToggle.Text = "Arresta Server UDP"
+            ' write in txtIpServer the IP address of this computer
+            Dim host = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName())
+            Dim localIp As String = ""
+            For Each ip In host.AddressList
+                If ip.AddressFamily = Net.Sockets.AddressFamily.InterNetwork Then
+                    localIp += ip.ToString() + vbNewLine
+                End If
+            Next
+            txtIpServer.Text = localIp
+            netTransfer.StartServer()
+            lblConnectionStatus.Text = "Server listening..."
+            'Else
+            '    MessageBox.Show("Impossibile avviare il server UDP", "Errore", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            'End If
+        Else
+            netTransfer = New NetTransfer_Udp(txtIpServer.Text, 27759)
+            netTransfer.IsServer = False
+            'btnToggle.Text = "Avvia Server UDP"
+            netTransfer.StartClient()
+            If netTransfer.IsConnected Then
+                lblConnectionStatus.Text = "Client connected"
+            Else
+                lblConnectionStatus.Text = "Error in connection"
+            End If
+        End If
+        btnConnect.Text = "Close"
+    End Sub
+    ' Evento per la connessione di un client UDP
+    Private Sub netTransfer_ClientConnected(clientId As String, e As IPEndPoint) Handles netTransfer.ClientConnected
+        ' Aggiorna la lista dei client connessi in modo thread-safe
+        If Me.InvokeRequired Then
+            'Me.Invoke(Sub() lstClients.Items.Add($"{e.ToString} ({clientId})"))
+            lstClients.DataSource = netTransfer.ConnectedClients
+            'lstClients.DisplayMember = "EndPointInfo.Address"
+        Else
+            'lstClients.Items.Add($"{e.ToString} ({clientId})")
+        End If
+    End Sub
+    ' Evento per la connessione di un client UDP
+    Private Sub netTransfer_ClientDisconnected(clientId As String) Handles netTransfer.ClientDisconnected
+        ' Aggiorna la lista dei client connessi in modo thread-safe
+        If Me.InvokeRequired Then
+            Me.Invoke(Sub() lstClients.Items.Remove($"({clientId})"))
+        Else
+            lstClients.Items.Remove($"({clientId})")
         End If
     End Sub
 End Class
